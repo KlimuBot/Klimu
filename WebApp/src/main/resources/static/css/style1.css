@@ -1,0 +1,71 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    height: 100%;
+    width: 100%;
+}
+
+
+/* aqui cambiar el height */
+
+.suscripciones {
+    grid-gap: 10px;
+    flex-direction: column;
+}
+
+
+/*label suscripcion*/
+
+.suscripciones a {
+    text-decoration: none;
+}
+
+.suscripciones a button {
+    display: contents;
+    padding-left: 10px;
+    font-weight: 750;
+    font-size: 1.4rem;
+    text-decoration: none;
+    color: black;
+    border-radius: 15px;
+}
+
+#unsuscribe {
+    font-weight: 600;
+    text-decoration: none;
+    color: grey;
+}
+
+span {
+    vertical-align: middle;
+    float: right;
+}
+
+#fill_image {
+    display: none;
+}
+
+
+/*medias*/
+
+@media (min-width: 600px) {
+    #fill_image {
+        display: block;
+    }
+    #fill_image>img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+    }
+    .logo {
+        height: 50%;
+    }
+}

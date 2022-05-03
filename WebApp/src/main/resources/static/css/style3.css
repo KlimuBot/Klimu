@@ -1,0 +1,56 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+html {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    height: 100%;
+    width: 100%;
+}
+
+.subscribe_button {
+    background-color: #EBEEE2;
+    border: none;
+    color: #302F2F;
+    font-weight: 720;
+    font-size: 1.1rem;
+    text-decoration: none;
+}
+
+#fill_image {
+    display: none;
+}
+
+#title label {
+    font-size: 1.6rem;
+    font-weight: 720;
+    text-align: start;
+}
+
+
+/*medias*/
+
+@media (min-width: 600px) {
+    #fill_image {
+        display: block;
+    }
+    #fill_image>img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+    }
+    * {
+        padding: 2px;
+    }
+    .logo img {
+        padding: 50px;
+    }
+    #imagen_sol {
+        display: none;
+    }
+}
