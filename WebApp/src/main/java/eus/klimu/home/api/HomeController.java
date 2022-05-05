@@ -14,5 +14,10 @@ public class HomeController {
         return "index";
     }
 
+    @RequestMapping(path = {"/email"})
+    public String email(Model model) {
+        return "services/email";
+    }
+
 }
 
