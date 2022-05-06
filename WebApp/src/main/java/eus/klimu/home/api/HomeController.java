@@ -61,7 +61,7 @@ public class HomeController {
 
     @GetMapping("/subscription")
     public String subscription() {
-        return "services/suscription0";
+        return "services/suscripciones";
     }
 }
 

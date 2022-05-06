@@ -1,32 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suscripciones</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"/>
-    <link rel="stylesheet" href="css/services/suscription.css"/>
+<!DOCTYPE html >
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="includes/head :: head">
+    <title id="pageTitle">Subscriptions</title>
 </head>
-
 <body>
+
+<!-- Custom Styling -->
+<link rel="stylesheet" th:href="@{'/css/services/suscription.css'}"/>
+
+<!-- Main -->
 <div class="row">
     <div class="col">
         <div class="logo text-center">
-            <img src="img/klimu_title.png" class="img-fluid p-5">
+            <img th:src="@{'/media/img/klimu_title.png'}" alt="KLIMU" class="img-fluid p-5">
         </div>
 
-        <div class="suscripciones d-flex justify-content-around px-3">
-            <a href="email.html" class="text-center">
-                <button class="btn">TELEGRAM<span class="fas fa-arrow-right"></span></button>
+        <div class="suscripciones d-flex justify-content-around px-3 ">
+            <a th:href="@{'/alerts'}" class="text-center subscription_box parent">
+                <button class="btn div1">TELEGRAM</button>
+                <img th:src="@{'/media/svg/arrow.svg'}" alt="flecha" class="div2">
             </a>
-            <a href="email.html" class="text-center">
-                <button class="btn">WHATSAPP<span class="fas fa-arrow-right"></span></button>
+            <a th:href="@{'/alerts'}" class="text-center subscription_box parent">
+                <button class="btn div1">WHATSAPP</button>
+                <img th:src="@{'/media/svg/arrow.svg'}" alt="flecha" class="div2">
             </a>
-            <a href="email.html" class="text-center">
-                <button class="btn">EMAIL<span class="fas fa-arrow-right"></span></button>
+            <a th:href="@{'/alerts'}" class="text-center subscription_box parent">
+                <button class="btn div1">EMAIL</button>
+                <img th:src="@{'/media/svg/arrow.svg'}" alt="flecha" class="div2">
             </a>
         </div>
 
@@ -36,7 +36,7 @@
         </div>
     </div>
     <div id="fill_image" class="col">
-        <img src="img/suscripciones_lateral.png" class="img-fluid">
+        <img th:src="@{'/media/img/suscripciones_lateral.png'}" class="img-fluid">
 
     </div>
 </div>
