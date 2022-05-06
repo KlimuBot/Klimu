@@ -18,6 +18,11 @@ public class HomeController {
     public String email(Model model) {
         return "services/email";
     }
+    
+    @GetMapping("/login/sign-in")
+    public String getLoginPage() {
+        return "users/login";
+    }
 
 }
 
