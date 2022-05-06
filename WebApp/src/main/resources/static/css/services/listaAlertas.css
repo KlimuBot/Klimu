@@ -166,9 +166,7 @@ span {
         width: 100%;
         object-fit: cover;
     }
-    .logo {
-        height: 50%;
-    }
+    
     .todo{
         flex-direction: row;
         width: 100%;
