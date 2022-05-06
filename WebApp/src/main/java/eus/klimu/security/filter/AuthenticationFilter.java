@@ -53,7 +53,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         // Save the tokens on the session and redirect the user to index.
         tokenManagement.setTokenOnSession(accessToken, refreshToken, request.getSession());
-        response.sendRedirect("/");
+        response.sendRedirect("/subscription");
     }
 
     @Override
