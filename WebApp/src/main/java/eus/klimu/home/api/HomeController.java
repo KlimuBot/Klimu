@@ -24,5 +24,10 @@ public class HomeController {
         return "users/login";
     }
 
+    @RequestMapping(path = {"/alerts"})
+    public String alerts(Model model){return "services/listaAlertas";}
+
+    @RequestMapping(path = {"/subscription"})
+    public String subscription(Model model){return "services/suscription0";}
 }
 
