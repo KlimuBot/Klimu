@@ -21,7 +21,10 @@ public class AuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         if (
-                !request.getServletPath().equals("/login/**") ||
+                !request.getServletPath().startsWith("/css") &&
+                !request.getServletPath().startsWith("/js") &&
+                !request.getServletPath().startsWith("/media") &&
+                !request.getServletPath().startsWith("/login") &&
                 !request.getServletPath().equals("/user/create")
         ) {
             HttpSession session = request.getSession();
@@ -34,9 +37,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
                     UsernamePasswordAuthenticationToken authToken = tokenManagement.getUsernamePasswordToken(accessToken);
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 } catch (Exception accessException) {
-                    log.info("Access token not found, trying to refresh");
                     String refreshToken = (String) session.getAttribute("refreshToken");
-
                     try {
                         UsernamePasswordAuthenticationToken authToken = tokenManagement.getUsernamePasswordToken(refreshToken);
                         SecurityContextHolder.getContext().setAuthentication(authToken);
