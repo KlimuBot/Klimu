@@ -1,6 +1,7 @@
 package eus.klimu.security;
 
 import eus.klimu.security.filter.AuthenticationFilter;
+import eus.klimu.security.filter.AuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -47,10 +49,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         // ACL list.
-        http.authorizeRequests().anyRequest().permitAll();
+        http.authorizeRequests()
+                .antMatchers("/js/**").permitAll()
+                .antMatchers("/css/**").permitAll()
+                .antMatchers("/media/**").permitAll()
+                .antMatchers("/login/**").permitAll()
+                .antMatchers("/user/create").permitAll()
+                .antMatchers("/**").hasAnyAuthority("USER_ROLE", "ADMIN_ROLE")
+                .antMatchers("/role/**").hasAuthority("ADMIN_ROLE")
+                .anyRequest().authenticated();
 
         // Add filters.
         http.addFilter(authenticationFilter);
+        http.addFilterBefore(new AuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean

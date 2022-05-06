@@ -1,7 +1,6 @@
 package eus.klimu.security.filter;
 
 import eus.klimu.security.TokenManagement;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,18 +17,6 @@ import java.io.IOException;
 
 @Slf4j
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-
-    /**
-     * Access token expiration time.
-     * 5 minutes in milliseconds.
-     */
-    private static final int ACCESS_TIME = 5 * 60 * 1000;
-
-    /**
-     * Refresh token expiration time.
-     * 6 hours in milliseconds.
-     */
-    private static final int REFRESH_TIME = 6 * 60 * 60 * 1000;
 
     private final AuthenticationManager authenticationManager;
 
@@ -58,10 +45,10 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         // Generate access and refresh tokens.
         String accessToken = tokenManagement.generateToken(
-                user, request.getRequestURL().toString(), ACCESS_TIME
+                user, request.getRequestURL().toString(), TokenManagement.ACCESS_TIME
         );
         String refreshToken = tokenManagement.generateToken(
-                user, request.getRequestURL().toString(), REFRESH_TIME
+                user, request.getRequestURL().toString(), TokenManagement.REFRESH_TIME
         );
 
         // Save the tokens on the session and redirect the user to index.

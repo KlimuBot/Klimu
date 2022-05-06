@@ -23,7 +23,12 @@ public class UserController {
         return ResponseEntity.ok().body(userService.getUser(username));
     }
 
-    @PostMapping("/save")
+    @GetMapping("/create")
+    public String getCreateUser() {
+        return "users/create_user";
+    }
+
+    @PostMapping("/create")
     public ResponseEntity<AppUser> saveUser(@RequestBody AppUser user) {
         AppUser newUser = userService.saveUser(user);
         if (user != null) {
