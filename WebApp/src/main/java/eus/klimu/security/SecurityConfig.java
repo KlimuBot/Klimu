@@ -50,17 +50,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         // ACL list.
         http.authorizeRequests()
-                .antMatchers("/js/**").permitAll()
-                .antMatchers("/css/**").permitAll()
-                .antMatchers("/media/**").permitAll()
-                .antMatchers("/login/**").permitAll()
-                .antMatchers("/user/create").permitAll();
-        http.authorizeRequests()
-                .antMatchers("/**").hasAnyAuthority("USER_ROLE", "ADMIN_ROLE")
+                .antMatchers("/js/**", "/css/**", "/media/**").permitAll()
+                .antMatchers("/user/create").permitAll()
+                .antMatchers("/", "/index", "/home").permitAll()
+            .and().authorizeRequests()
+                .antMatchers("/role/**").hasAuthority("ADMIN_ROLE")
                 .antMatchers("/email/**").hasAnyAuthority("USER_ROLE", "ADMIN_ROLE")
-                .antMatchers("/role/**").hasAuthority("ADMIN_ROLE");
-        http.authorizeRequests()
-                .anyRequest().authenticated();
+            .and().authorizeRequests()
+                .anyRequest().authenticated()
+            .and()
+                .formLogin().loginPage("/login/sign-in").loginProcessingUrl("/login").permitAll()
+            .and()
+                .exceptionHandling().accessDeniedPage("/error/403")
+            .and()
+                .logout().logoutUrl("/logout").logoutSuccessUrl("/");
 
         // Add filters.
         http.addFilter(authenticationFilter);
