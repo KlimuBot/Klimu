@@ -19,10 +19,10 @@ public class HomeController {
         return "index";
     }
     
-    @GetMapping("/login/sign-in{error}")
+    @GetMapping("/login/sign-in")
     public String getLoginPage(
             Model model,
-            @PathVariable(name = "error", required = false) String error
+            @RequestParam(value = "error", required = false) String error
     ) {
         if (error != null && error.length() > 1) {
             model.addAttribute("errorMsg", error);
@@ -54,8 +54,12 @@ public class HomeController {
         return "services/email";
     }
 
-    @GetMapping("/alerts")
-    public String alerts() {
+    @GetMapping("/subscription/alerts/{type}")
+    public String alerts(@PathVariable String type) {
+        switch (type) {
+            case "telegram": break;
+            default: break;
+        }
         return "services/listaAlertas";
     }
 
