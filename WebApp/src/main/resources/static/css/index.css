@@ -3,6 +3,7 @@
     margin: 0;
 }
 
+/*
 html {
     height: 100%;
     width: 100%;
@@ -12,6 +13,7 @@ body {
     height: 100%;
     width: 100%;
 }
+*/
 
 .subscribe_button {
     background-color: #EBEEE2;
@@ -44,9 +46,9 @@ body {
         width: 100%;
         object-fit: cover;
     }
-    * {
+    /** {
         padding: 2px;
-    }
+    }*/
     .logo img {
         padding: 50px;
     }
