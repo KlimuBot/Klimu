@@ -4,15 +4,16 @@
 }
 
 html {
-    height: 100%;
     width: 100%;
 }
 
 body {
-    height: 100%;
-    width: 100%;
+
 }
 
+.col{
+    padding: 0;
+}
 
 /* aqui cambiar el height */
 
@@ -84,7 +85,6 @@ span {
 #fill_image {
     display: none;
     height: 98vh;
-    padding: 1rem;
 }
 
 
@@ -99,5 +99,4 @@ span {
         width: 100%;
         object-fit: cover;
     }
-
 }

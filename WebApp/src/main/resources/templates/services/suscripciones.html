@@ -2,17 +2,24 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="includes/head :: head">
     <title id="pageTitle">Subscriptions</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
+            integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
+            integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
+            crossorigin="anonymous"></script>
 </head>
 <body>
 
 <!-- Custom Styling -->
-<link rel="stylesheet" th:href="@{'/css/services/suscription.css'}"/>
+<link rel="stylesheet" th:href="@{'/css/services/listaAlertas.css'}"/>
 
 <!-- Main -->
-<div class="row">
-    <div class="col">
+<div class="todo">
+    <div class="left">
         <div class="logo text-center">
-            <img th:src="@{'/media/img/klimu_title.png'}" alt="KLIMU" class="img-fluid p-5">
+            <img th:src="@{'/media/img/klimu_title.png'}" alt="KLIMU" class="img-fluid">
         </div>
 
         <div class="suscripciones d-flex justify-content-around px-3 ">
@@ -39,18 +46,9 @@
             <a id="unsuscribe" href="#">UNSUSCRIBE?</a>
         </div>
     </div>
-    <div id="fill_image" class="col">
+    <div id="fill_image" class="right">
         <img th:src="@{'/media/img/suscripciones_lateral.png'}" class="img-fluid">
-
     </div>
 </div>
 </body>
-
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
-        integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
-        crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
-        integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
-        crossorigin="anonymous"></script>
-
 </html>

@@ -4,12 +4,10 @@
 }
 
 html {
-    
     width: 100%;
 }
 
 body {
-   
     width: 100%;
 }
 
@@ -54,10 +52,11 @@ body {
 .py-4{
     padding-top: 0 !important  ;
 }
-.blur{
+
+/*.blur{
 
     filter: blur(4px);
-}
+}*/
 .parent {
     display: grid;
     grid-template-columns: 2fr repeat(2, 1fr);
