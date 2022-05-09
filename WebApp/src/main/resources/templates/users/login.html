@@ -8,30 +8,33 @@
     <link rel="stylesheet" th:href="@{'/css/users/login.css'}"/>
 
     <!-- Main -->
-    <div class="row">
-        <div class="login col">
-            <div class="logo">
-                <img id="img_uno" th:src="@{'/media/img/logo1.png'}" alt="Logo de KLIMU" class="img-fluid">
-                <img id="img_dos" th:src="@{'/media/img/klimu_title.png'}" alt="KLIMU" class="img-fluid">
-            </div>
+    <main class="container">
+        <div id="error-msg" class="alert alert-danger" th:if="${errorMsg != null}" th:text="${errorMsg}"></div>
+        <div class="row">
+            <div class="login col">
+                <div class="logo">
+                    <img id="img_uno" th:src="@{'/media/img/logo1.png'}" alt="Logo de KLIMU" class="img-fluid">
+                    <img id="img_dos" th:src="@{'/media/img/klimu_title.png'}" alt="KLIMU" class="img-fluid">
+                </div>
 
-            <div class="mt-4 title"> Log in</div>
-            <form class="p-3 mt-3" method="post" action="/login">
-                <div class="dato_usuario d-flex align-items-center"><span class="fas fa-user"></span>
-                    <input id="username" name="username" type="text" placeholder="username or email address">
+                <div class="mt-4 title"> Log in</div>
+                <form class="p-3 mt-3" method="post" action="/login">
+                    <div class="dato_usuario d-flex align-items-center"><span class="fas fa-user"></span>
+                        <input id="username" name="username" type="text" placeholder="username or email address">
+                    </div>
+                    <div class="dato_usuario d-flex align-items-center"><span class="fas fa-key"></span>
+                        <input id="password" name="password" type="password" placeholder="password">
+                    </div>
+                    <button class="btn mt-3" type="submit">Login</button>
+                </form>
+                <div class="text-center">
+                    <a th:href="@{'/user/create'}">Don't have an account?<br>Sign up</a>
                 </div>
-                <div class="dato_usuario d-flex align-items-center"><span class="fas fa-key"></span>
-                    <input id="password" name="password" type="password" placeholder="password">
-                </div>
-                <button class="btn mt-3" type="submit">Login</button>
-            </form>
-            <div class="text-center">
-                <a th:href="@{'/user/create'}">Don't have an account?<br>Sign up</a>
+            </div>
+            <div id="fill_image" class="col">
+                <img th:src="@{'/media/img/klimu_login_2.png'}" class="img-fluid">
             </div>
         </div>
-        <div id="fill_image" class="col">
-            <img th:src="@{'/media/img/klimu_login_2.png'}" class="img-fluid">
-        </div>
-    </div>
+    </main>
 </body>
 </html>

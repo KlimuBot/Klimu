@@ -16,16 +16,20 @@
         </div>
 
         <div class="suscripciones d-flex justify-content-around px-3 ">
-            <a th:href="@{'/alerts'}" class="text-center subscription_box parent">
+            <a th:href="@{'/subscription/alerts/telegram'}" class="text-center subscription_box parent">
                 <button class="btn div1">TELEGRAM</button>
                 <img th:src="@{'/media/svg/arrow.svg'}" alt="flecha" class="div2">
             </a>
-            <a th:href="@{'/alerts'}" class="text-center subscription_box parent">
+            <a th:href="@{'/subscription/alerts/whatsapp'}" class="text-center subscription_box parent">
                 <button class="btn div1">WHATSAPP</button>
                 <img th:src="@{'/media/svg/arrow.svg'}" alt="flecha" class="div2">
             </a>
-            <a th:href="@{'/alerts'}" class="text-center subscription_box parent">
+            <a th:href="@{'/subscription/alerts/email'}" class="text-center subscription_box parent">
                 <button class="btn div1">EMAIL</button>
+                <img th:src="@{'/media/svg/arrow.svg'}" alt="flecha" class="div2">
+            </a>
+            <a th:href="@{'/subscription/alerts/desktop'}" class="text-center subscription_box parent">
+                <button class="btn div1">DESKTOP</button>
                 <img th:src="@{'/media/svg/arrow.svg'}" alt="flecha" class="div2">
             </a>
         </div>

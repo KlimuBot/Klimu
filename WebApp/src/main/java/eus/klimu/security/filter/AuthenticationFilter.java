@@ -39,7 +39,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+                                            Authentication authentication) throws IOException, ServletException {
         User user = (User) authentication.getPrincipal();
         TokenManagement tokenManagement = new TokenManagement();
 
@@ -50,14 +51,14 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         String refreshToken = tokenManagement.generateToken(
                 user, request.getRequestURL().toString(), TokenManagement.REFRESH_TIME
         );
-
         // Save the tokens on the session and redirect the user to index.
         tokenManagement.setTokenOnSession(accessToken, refreshToken, request.getSession());
         response.sendRedirect("/subscription");
     }
 
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+                                              AuthenticationException failed) throws IOException, ServletException {
+        response.sendRedirect("/login/sign-in?error=User-not-found");
     }
 }
