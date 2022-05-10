@@ -105,19 +105,15 @@ body {
         display: none;
     }
     #img_dos {
-        padding: 40px;
+
         display: block;
     }
 }
 
 @media (min-width: 1200px) {
-    #img_dos {
-        padding: 100px;
-    }
+
 }
 
 @media (min-width: 1600px) {
-    #img_dos {
-        padding: 190px;
-    }
+
 }

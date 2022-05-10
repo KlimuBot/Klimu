@@ -76,6 +76,9 @@ body {
     text-decoration: none;
     color: grey;
 }
+.logo{
+    width: 70%;
+}
 
 span {
     vertical-align: middle;
