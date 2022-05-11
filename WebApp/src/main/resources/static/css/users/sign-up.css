@@ -1,0 +1,103 @@
+body{
+    font-family: 'Bebas Neue', cursive;
+}
+.cont{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.logo_title{
+    width: 20%;
+}
+.title{
+    width: 50%;
+    margin: 1rem;
+}
+.klimu_grafico{
+    position: absolute;
+    bottom: 0;
+    right: 18%;
+    width: 68%;
+}
+.text{
+    padding-left: 10%;
+    padding-right: 10%;
+    text-align: center;
+
+}
+
+.input_texto{
+    height: 2.4rem;
+    background-color: #EBEEE2;
+    border-color: #EBEEE2;
+    border-style: none;
+
+    outline: none;
+    padding: 0.3rem;
+}
+
+.conjunto{
+    display: flex;
+    flex-direction: column;
+}
+.parent{
+    width: 80%;
+}
+.parent > div {
+    margin: 0.2rem;
+}
+.div3 {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+
+}
+.div3 > button {
+    width: 20%;
+}
+.subscription_box{
+    background-color: #EBEEE2;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 60%;
+    height: 4.5rem;
+    text-decoration: none;
+}
+.div3{
+    margin-top: 1rem !important;
+}
+
+@media (min-width: 992px) {
+
+    .parent > div {
+        margin: 0;
+    }
+    .parent {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        grid-template-rows: repeat(3, 0.3fr) 0.2fr;
+        grid-column-gap: 0px;
+        grid-row-gap: 0.8rem;
+        width: 80%;
+    }
+
+    .div1 { grid-area: 1 / 1 / 2 / 4; }
+    .div2 { grid-area: 1 / 6 / 2 / 11; }
+    .div3 {
+        grid-area: 4 / 4 / 5 / 8;
+        display: flex;
+        justify-content: center;
+
+    }
+    .div3 > button {
+        width: 20%;
+    }
+    .div4 { grid-area: 2 / 1 / 3 / 6; }
+    .div5 { grid-area: 2 / 8 / 3 / 11; }
+    .div6 { grid-area: 3 / 1 / 4 / 5; }
+    .div7 { grid-area: 3 / 7 / 4 / 11; }
+
+}
