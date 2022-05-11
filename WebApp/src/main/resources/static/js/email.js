@@ -5,596 +5,546 @@
 
 'use strict';
 
-class ComboboxAutocomplete {
-    constructor(comboboxNode, buttonNode, listboxNode) {
-        this.comboboxNode = comboboxNode;
-        this.buttonNode = buttonNode;
-        this.listboxNode = listboxNode;
+var aria = aria || {};
 
-        this.comboboxHasVisualFocus = false;
-        this.listboxHasVisualFocus = false;
+/**
+ * @class
+ * @description
+ *  Combobox object representing the state and interactions for a combobox
+ *  widget
+ * @param input
+ *  The input node
+ * @param grid
+ *  The grid node to load results in
+ * @param searchFn
+ *  The search function. The function accepts a search string and returns an
+ *  array of results.
+ */
+aria.GridCombobox = function (input, grid, searchFn) {
+    this.input = input;
+    this.grid = grid;
+    this.searchFn = searchFn;
+    this.activeRowIndex = -1;
+    this.activeColIndex = 0;
+    this.rowsCount = 0;
+    this.colsCount = 0;
+    this.gridFocused = false;
+    this.shown = false;
+    this.selectionCol = 0;
 
-        this.hasHover = false;
+    this.setupEvents();
+};
 
-        this.isNone = false;
-        this.isList = false;
-        this.isBoth = false;
+aria.GridCombobox.prototype.setupEvents = function () {
+    document.body.addEventListener('click', this.handleBodyClick.bind(this));
+    this.input.addEventListener('keyup', this.handleInputKeyUp.bind(this));
+    this.input.addEventListener('keydown', this.handleInputKeyDown.bind(this));
+    this.input.addEventListener('focus', this.handleInputFocus.bind(this));
+    this.grid.addEventListener('click', this.handleGridClick.bind(this));
+};
 
-        this.allOptions = [];
-
-        this.option = null;
-        this.firstOption = null;
-        this.lastOption = null;
-
-        this.filteredOptions = [];
-        this.filter = '';
-
-        var autocomplete = this.comboboxNode.getAttribute('aria-autocomplete');
-
-        if (typeof autocomplete === 'string') {
-            autocomplete = autocomplete.toLowerCase();
-            this.isNone = autocomplete === 'none';
-            this.isList = autocomplete === 'list';
-            this.isBoth = autocomplete === 'both';
-        } else {
-            // default value of autocomplete
-            this.isNone = true;
-        }
-
-        this.comboboxNode.addEventListener(
-            'keydown',
-            this.onComboboxKeyDown.bind(this)
-        );
-        this.comboboxNode.addEventListener(
-            'keyup',
-            this.onComboboxKeyUp.bind(this)
-        );
-        this.comboboxNode.addEventListener(
-            'click',
-            this.onComboboxClick.bind(this)
-        );
-        this.comboboxNode.addEventListener(
-            'focus',
-            this.onComboboxFocus.bind(this)
-        );
-        this.comboboxNode.addEventListener('blur', this.onComboboxBlur.bind(this));
-
-        document.body.addEventListener(
-            'pointerup',
-            this.onBackgroundPointerUp.bind(this),
-            true
-        );
-
-        // initialize pop up menu
-
-        this.listboxNode.addEventListener(
-            'pointerover',
-            this.onListboxPointerover.bind(this)
-        );
-        this.listboxNode.addEventListener(
-            'pointerout',
-            this.onListboxPointerout.bind(this)
-        );
-
-        // Traverse the element children of domNode: configure each with
-        // option role behavior and store reference in.options array.
-        var nodes = this.listboxNode.getElementsByTagName('LI');
-
-        for (var i = 0; i < nodes.length; i++) {
-            var node = nodes[i];
-            this.allOptions.push(node);
-
-            node.addEventListener('click', this.onOptionClick.bind(this));
-            node.addEventListener('pointerover', this.onOptionPointerover.bind(this));
-            node.addEventListener('pointerout', this.onOptionPointerout.bind(this));
-        }
-
-        this.filterOptions();
-
-        // Open Button
-
-        var button = this.comboboxNode.nextElementSibling;
-
-        if (button && button.tagName === 'BUTTON') {
-            button.addEventListener('click', this.onButtonClick.bind(this));
-        }
+aria.GridCombobox.prototype.handleBodyClick = function (evt) {
+    if (evt.target === this.input || this.grid.contains(evt.target)) {
+        return;
     }
+    this.hideResults();
+};
 
-    getLowercaseContent(node) {
-        return node.textContent.toLowerCase();
-    }
+aria.GridCombobox.prototype.handleInputKeyUp = function (evt) {
+    var key = evt.which || evt.keyCode;
 
-    isOptionInView(option) {
-        var bounding = option.getBoundingClientRect();
-        return (
-            bounding.top >= 0 &&
-            bounding.left >= 0 &&
-            bounding.bottom <=
-            (window.innerHeight || document.documentElement.clientHeight) &&
-            bounding.right <=
-            (window.innerWidth || document.documentElement.clientWidth)
-        );
-    }
-
-    setActiveDescendant(option) {
-        if (option && this.listboxHasVisualFocus) {
-            this.comboboxNode.setAttribute('aria-activedescendant', option.id);
-            if (!this.isOptionInView(option)) {
-                option.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-        } else {
-            this.comboboxNode.setAttribute('aria-activedescendant', '');
-        }
-    }
-
-    setValue(value) {
-        this.filter = value;
-        this.comboboxNode.value = this.filter;
-        this.comboboxNode.setSelectionRange(this.filter.length, this.filter.length);
-        this.filterOptions();
-    }
-
-    setOption(option, flag) {
-        if (typeof flag !== 'boolean') {
-            flag = false;
-        }
-
-        if (option) {
-            this.option = option;
-            this.setCurrentOptionStyle(this.option);
-            this.setActiveDescendant(this.option);
-
-            if (this.isBoth) {
-                this.comboboxNode.value = this.option.textContent;
-                if (flag) {
-                    this.comboboxNode.setSelectionRange(
-                        this.option.textContent.length,
-                        this.option.textContent.length
-                    );
-                } else {
-                    this.comboboxNode.setSelectionRange(
-                        this.filter.length,
-                        this.option.textContent.length
-                    );
-                }
-            }
-        }
-    }
-
-    setVisualFocusCombobox() {
-        this.listboxNode.classList.remove('focus');
-        this.comboboxNode.parentNode.classList.add('focus'); // set the focus class to the parent for easier styling
-        this.comboboxHasVisualFocus = true;
-        this.listboxHasVisualFocus = false;
-        this.setActiveDescendant(false);
-    }
-
-    setVisualFocusListbox() {
-        this.comboboxNode.parentNode.classList.remove('focus');
-        this.comboboxHasVisualFocus = false;
-        this.listboxHasVisualFocus = true;
-        this.listboxNode.classList.add('focus');
-        this.setActiveDescendant(this.option);
-    }
-
-    removeVisualFocusAll() {
-        this.comboboxNode.parentNode.classList.remove('focus');
-        this.comboboxHasVisualFocus = false;
-        this.listboxHasVisualFocus = false;
-        this.listboxNode.classList.remove('focus');
-        this.option = null;
-        this.setActiveDescendant(false);
-    }
-
-    // ComboboxAutocomplete Events
-
-    filterOptions() {
-        // do not filter any options if autocomplete is none
-        if (this.isNone) {
-            this.filter = '';
-        }
-
-        var option = null;
-        var currentOption = this.option;
-        var filter = this.filter.toLowerCase();
-
-        this.filteredOptions = [];
-        this.listboxNode.innerHTML = '';
-
-        for (var i = 0; i < this.allOptions.length; i++) {
-            option = this.allOptions[i];
-            if (
-                filter.length === 0 ||
-                this.getLowercaseContent(option).indexOf(filter) === 0
-            ) {
-                this.filteredOptions.push(option);
-                this.listboxNode.appendChild(option);
-            }
-        }
-
-        // Use populated options array to initialize firstOption and lastOption.
-        var numItems = this.filteredOptions.length;
-        if (numItems > 0) {
-            this.firstOption = this.filteredOptions[0];
-            this.lastOption = this.filteredOptions[numItems - 1];
-
-            if (currentOption && this.filteredOptions.indexOf(currentOption) >= 0) {
-                option = currentOption;
-            } else {
-                option = this.firstOption;
-            }
-        } else {
-            this.firstOption = null;
-            option = null;
-            this.lastOption = null;
-        }
-
-        return option;
-    }
-
-    setCurrentOptionStyle(option) {
-        for (var i = 0; i < this.filteredOptions.length; i++) {
-            var opt = this.filteredOptions[i];
-            if (opt === option) {
-                opt.setAttribute('aria-selected', 'true');
-                if (
-                    this.listboxNode.scrollTop + this.listboxNode.offsetHeight <
-                    opt.offsetTop + opt.offsetHeight
-                ) {
-                    this.listboxNode.scrollTop =
-                        opt.offsetTop + opt.offsetHeight - this.listboxNode.offsetHeight;
-                } else if (this.listboxNode.scrollTop > opt.offsetTop + 2) {
-                    this.listboxNode.scrollTop = opt.offsetTop;
-                }
-            } else {
-                opt.removeAttribute('aria-selected');
-            }
-        }
-    }
-
-    getPreviousOption(currentOption) {
-        if (currentOption !== this.firstOption) {
-            var index = this.filteredOptions.indexOf(currentOption);
-            return this.filteredOptions[index - 1];
-        }
-        return this.lastOption;
-    }
-
-    getNextOption(currentOption) {
-        if (currentOption !== this.lastOption) {
-            var index = this.filteredOptions.indexOf(currentOption);
-            return this.filteredOptions[index + 1];
-        }
-        return this.firstOption;
-    }
-
-    /* MENU DISPLAY METHODS */
-
-    doesOptionHaveFocus() {
-        return this.comboboxNode.getAttribute('aria-activedescendant') !== '';
-    }
-
-    isOpen() {
-        return this.listboxNode.style.display === 'block';
-    }
-
-    isClosed() {
-        return this.listboxNode.style.display !== 'block';
-    }
-
-    hasOptions() {
-        return this.filteredOptions.length;
-    }
-
-    open() {
-        this.listboxNode.style.display = 'block';
-        this.comboboxNode.setAttribute('aria-expanded', 'true');
-        this.buttonNode.setAttribute('aria-expanded', 'true');
-    }
-
-    close(force) {
-        if (typeof force !== 'boolean') {
-            force = false;
-        }
-
-        if (
-            force ||
-            (!this.comboboxHasVisualFocus &&
-                !this.listboxHasVisualFocus &&
-                !this.hasHover)
-        ) {
-            this.setCurrentOptionStyle(false);
-            this.listboxNode.style.display = 'none';
-            this.comboboxNode.setAttribute('aria-expanded', 'false');
-            this.buttonNode.setAttribute('aria-expanded', 'false');
-            this.setActiveDescendant(false);
-            this.comboboxNode.parentNode.classList.add('focus');
-        }
-    }
-
-    /* combobox Events */
-
-    onComboboxKeyDown(event) {
-        var flag = false,
-            altKey = event.altKey;
-
-        if (event.ctrlKey || event.shiftKey) {
+    switch (key) {
+        case aria.KeyCode.UP:
+        case aria.KeyCode.DOWN:
+        case aria.KeyCode.ESC:
+        case aria.KeyCode.RETURN:
+            evt.preventDefault();
             return;
+        case aria.KeyCode.LEFT:
+        case aria.KeyCode.RIGHT:
+            if (this.gridFocused) {
+                evt.preventDefault();
+                return;
+            }
+            break;
+        default:
+            this.updateResults();
+    }
+};
+
+aria.GridCombobox.prototype.handleInputKeyDown = function (evt) {
+    var key = evt.which || evt.keyCode;
+    var activeRowIndex = this.activeRowIndex;
+    var activeColIndex = this.activeColIndex;
+
+    if (key === aria.KeyCode.ESC) {
+        if (this.gridFocused) {
+            this.gridFocused = false;
+            this.removeFocusCell(this.activeRowIndex, this.activeColIndex);
+            this.activeRowIndex = -1;
+            this.activeColIndex = 0;
+            this.input.setAttribute('aria-activedescendant', '');
+        } else {
+            if (!this.shown) {
+                setTimeout(
+                    function () {
+                        // On Firefox, input does not get cleared here unless wrapped in
+                        // a setTimeout
+                        this.input.value = '';
+                    }.bind(this),
+                    1
+                );
+            }
         }
-
-        switch (event.key) {
-            case 'Enter':
-                if (this.listboxHasVisualFocus) {
-                    this.setValue(this.option.textContent);
-                }
-                this.close(true);
-                this.setVisualFocusCombobox();
-                flag = true;
-                break;
-
-            case 'Down':
-            case 'ArrowDown':
-                if (this.filteredOptions.length > 0) {
-                    if (altKey) {
-                        this.open();
-                    } else {
-                        this.open();
-                        if (
-                            this.listboxHasVisualFocus ||
-                            (this.isBoth && this.filteredOptions.length > 1)
-                        ) {
-                            this.setOption(this.getNextOption(this.option), true);
-                            this.setVisualFocusListbox();
-                        } else {
-                            this.setOption(this.firstOption, true);
-                            this.setVisualFocusListbox();
-                        }
-                    }
-                }
-                flag = true;
-                break;
-
-            case 'Up':
-            case 'ArrowUp':
-                if (this.hasOptions()) {
-                    if (this.listboxHasVisualFocus) {
-                        this.setOption(this.getPreviousOption(this.option), true);
-                    } else {
-                        this.open();
-                        if (!altKey) {
-                            this.setOption(this.lastOption, true);
-                            this.setVisualFocusListbox();
-                        }
-                    }
-                }
-                flag = true;
-                break;
-
-            case 'Esc':
-            case 'Escape':
-                if (this.isOpen()) {
-                    this.close(true);
-                    this.filter = this.comboboxNode.value;
-                    this.filterOptions();
-                    this.setVisualFocusCombobox();
-                } else {
-                    this.setValue('');
-                    this.comboboxNode.value = '';
-                }
-                this.option = null;
-                flag = true;
-                break;
-
-            case 'Tab':
-                this.close(true);
-                if (this.listboxHasVisualFocus) {
-                    if (this.option) {
-                        this.setValue(this.option.textContent);
-                    }
-                }
-                break;
-
-            case 'Home':
-                this.comboboxNode.setSelectionRange(0, 0);
-                flag = true;
-                break;
-
-            case 'End':
-                var length = this.comboboxNode.value.length;
-                this.comboboxNode.setSelectionRange(length, length);
-                flag = true;
-                break;
-
-            default:
-                break;
+        if (this.shown) {
+            this.hideResults();
         }
-
-        if (flag) {
-            event.stopPropagation();
-            event.preventDefault();
-        }
+        return;
     }
 
-    isPrintableCharacter(str) {
-        return str.length === 1 && str.match(/\S| /);
+    if (this.rowsCount < 1) {
+        return;
     }
 
-    onComboboxKeyUp(event) {
-        var flag = false,
-            option = null,
-            char = event.key;
+    var prevActive = this.getItemAt(activeRowIndex, this.selectionCol);
+    var activeItem;
 
-        if (this.isPrintableCharacter(char)) {
-            this.filter += char;
-        }
-
-        // this is for the case when a selection in the textbox has been deleted
-        if (this.comboboxNode.value.length < this.filter.length) {
-            this.filter = this.comboboxNode.value;
-            this.option = null;
-            this.filterOptions();
-        }
-
-        if (event.key === 'Escape' || event.key === 'Esc') {
+    switch (key) {
+        case aria.KeyCode.UP:
+            this.gridFocused = true;
+            activeRowIndex = this.getRowIndex(key);
+            evt.preventDefault();
+            break;
+        case aria.KeyCode.DOWN:
+            this.gridFocused = true;
+            activeRowIndex = this.getRowIndex(key);
+            evt.preventDefault();
+            break;
+        case aria.KeyCode.LEFT:
+            if (activeColIndex <= 0) {
+                activeColIndex = this.colsCount - 1;
+                activeRowIndex = this.getRowIndex(key);
+            } else {
+                activeColIndex--;
+            }
+            if (this.gridFocused) {
+                evt.preventDefault();
+            }
+            break;
+        case aria.KeyCode.RIGHT:
+            if (activeColIndex === -1 || activeColIndex >= this.colsCount - 1) {
+                activeColIndex = 0;
+                activeRowIndex = this.getRowIndex(key);
+            } else {
+                activeColIndex++;
+            }
+            if (this.gridFocused) {
+                evt.preventDefault();
+            }
+            break;
+        case aria.KeyCode.RETURN:
+            activeItem = this.getItemAt(activeRowIndex, this.selectionCol);
+            this.selectItem(activeItem);
+            this.gridFocused = false;
             return;
+        case aria.KeyCode.TAB:
+            this.hideResults();
+            return;
+        default:
+            return;
+    }
+
+    if (prevActive) {
+        this.removeFocusCell(this.activeRowIndex, this.activeColIndex);
+        prevActive.setAttribute('aria-selected', 'false');
+    }
+
+    activeItem = this.getItemAt(activeRowIndex, activeColIndex);
+    this.activeRowIndex = activeRowIndex;
+    this.activeColIndex = activeColIndex;
+
+    if (activeItem) {
+        this.input.setAttribute(
+            'aria-activedescendant',
+            'result-item-' + activeRowIndex + 'x' + activeColIndex
+        );
+        this.focusCell(activeRowIndex, activeColIndex);
+        var selectedItem = this.getItemAt(activeRowIndex, this.selectionCol);
+        selectedItem.setAttribute('aria-selected', 'true');
+    } else {
+        this.input.setAttribute('aria-activedescendant', '');
+    }
+};
+
+aria.GridCombobox.prototype.handleInputFocus = function () {
+    this.updateResults();
+};
+
+aria.GridCombobox.prototype.handleGridClick = function (evt) {
+    if (!evt.target) {
+        return;
+    }
+
+    var row;
+    if (evt.target.getAttribute('role') === 'row') {
+        row = evt.target;
+    } else if (evt.target.getAttribute('role') === 'gridcell') {
+        row = evt.target.parentNode;
+    } else {
+        return;
+    }
+
+    var selectItem = row.querySelector('.result-cell');
+    this.selectItem(selectItem);
+};
+
+aria.GridCombobox.prototype.isElementInView = function (element) {
+    var bounding = element.getBoundingClientRect();
+
+    return (
+        bounding.top >= 0 &&
+        bounding.left >= 0 &&
+        bounding.bottom <=
+        (window.innerHeight || document.documentElement.clientHeight) &&
+        bounding.right <=
+        (window.innerWidth || document.documentElement.clientWidth)
+    );
+};
+
+aria.GridCombobox.prototype.updateResults = function () {
+    var searchString = this.input.value;
+    var results = this.searchFn(searchString);
+
+    this.hideResults();
+
+    if (!searchString) {
+        results = [];
+    }
+
+    if (results.length) {
+        for (var row = 0; row < results.length; row++) {
+            var resultRow = document.createElement('div');
+            resultRow.className = 'result-row';
+            resultRow.setAttribute('role', 'row');
+            resultRow.setAttribute('id', 'result-row-' + row);
+            for (var col = 0; col < results[row].length; col++) {
+                var resultCell = document.createElement('div');
+                resultCell.className = 'result-cell';
+                resultCell.setAttribute('role', 'gridcell');
+                resultCell.setAttribute('id', 'result-item-' + row + 'x' + col);
+                resultCell.innerText = results[row][col];
+                resultRow.appendChild(resultCell);
+            }
+            this.grid.appendChild(resultRow);
         }
+        aria.Utils.removeClass(this.grid, 'hidden');
+        this.input.setAttribute('aria-expanded', 'true');
+        this.rowsCount = results.length;
+        this.colsCount = results.length ? results[0].length : 0;
+        this.shown = true;
+    }
+};
 
-        switch (event.key) {
-            case 'Backspace':
-                this.setVisualFocusCombobox();
-                this.setCurrentOptionStyle(false);
-                this.filter = this.comboboxNode.value;
-                this.option = null;
-                this.filterOptions();
-                flag = true;
-                break;
+aria.GridCombobox.prototype.getRowIndex = function (key) {
+    var activeRowIndex = this.activeRowIndex;
 
-            case 'Left':
-            case 'ArrowLeft':
-            case 'Right':
-            case 'ArrowRight':
-            case 'Home':
-            case 'End':
-                if (this.isBoth) {
-                    this.filter = this.comboboxNode.value;
-                } else {
-                    this.option = null;
-                    this.setCurrentOptionStyle(false);
-                }
-                this.setVisualFocusCombobox();
-                flag = true;
-                break;
+    switch (key) {
+        case aria.KeyCode.UP:
+        case aria.KeyCode.LEFT:
+            if (activeRowIndex <= 0) {
+                activeRowIndex = this.rowsCount - 1;
+            } else {
+                activeRowIndex--;
+            }
+            break;
+        case aria.KeyCode.DOWN:
+        case aria.KeyCode.RIGHT:
+            if (activeRowIndex === -1 || activeRowIndex >= this.rowsCount - 1) {
+                activeRowIndex = 0;
+            } else {
+                activeRowIndex++;
+            }
+    }
 
-            default:
-                if (this.isPrintableCharacter(char)) {
-                    this.setVisualFocusCombobox();
-                    this.setCurrentOptionStyle(false);
-                    flag = true;
+    return activeRowIndex;
+};
 
-                    if (this.isList || this.isBoth) {
-                        option = this.filterOptions();
-                        if (option) {
-                            if (this.isClosed() && this.comboboxNode.value.length) {
-                                this.open();
-                            }
+aria.GridCombobox.prototype.getItemAt = function (rowIndex, colIndex) {
+    return document.getElementById('result-item-' + rowIndex + 'x' + colIndex);
+};
 
-                            if (
-                                this.getLowercaseContent(option).indexOf(
-                                    this.comboboxNode.value.toLowerCase()
-                                ) === 0
-                            ) {
-                                this.option = option;
-                                if (this.isBoth || this.listboxHasVisualFocus) {
-                                    this.setCurrentOptionStyle(option);
-                                    if (this.isBoth) {
-                                        this.setOption(option);
-                                    }
-                                }
-                            } else {
-                                this.option = null;
-                                this.setCurrentOptionStyle(false);
-                            }
-                        } else {
-                            this.close();
-                            this.option = null;
-                            this.setActiveDescendant(false);
-                        }
-                    } else if (this.comboboxNode.value.length) {
-                        this.open();
-                    }
-                }
+aria.GridCombobox.prototype.selectItem = function (item) {
+    if (item) {
+        this.input.value = item.innerText;
+        this.hideResults();
+    }
+};
 
-                break;
+aria.GridCombobox.prototype.hideResults = function () {
+    this.gridFocused = false;
+    this.shown = false;
+    this.activeRowIndex = -1;
+    this.activeColIndex = 0;
+    this.grid.innerHTML = '';
+    aria.Utils.addClass(this.grid, 'hidden');
+    this.input.setAttribute('aria-expanded', 'false');
+    this.rowsCount = 0;
+    this.colsCount = 0;
+    this.input.setAttribute('aria-activedescendant', '');
+
+    // ensure the input is in view
+    if (!this.isElementInView(this.input)) {
+        this.input.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+};
+
+aria.GridCombobox.prototype.removeFocusCell = function (rowIndex, colIndex) {
+    var row = document.getElementById('result-row-' + rowIndex);
+    aria.Utils.removeClass(row, 'focused');
+    var cell = this.getItemAt(rowIndex, colIndex);
+    aria.Utils.removeClass(cell, 'focused-cell');
+};
+
+aria.GridCombobox.prototype.focusCell = function (rowIndex, colIndex) {
+    var row = document.getElementById('result-row-' + rowIndex);
+    aria.Utils.addClass(row, 'focused');
+    var cell = this.getItemAt(rowIndex, colIndex);
+    aria.Utils.addClass(cell, 'focused-cell');
+
+    // ensure the cell is in view
+    if (!this.isElementInView(cell)) {
+        cell.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+};
+/*
+ *   This content is licensed according to the W3C Software License at
+ *   https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
+ *
+ * ARIA Combobox Examples
+ */
+
+'use strict';
+
+var aria = aria || {};
+
+var COUNTRIES_AND_CITIES = [
+    ['Chicago', 'USA'],
+    ['New York', 'USA'],
+    ['Los Angeles', 'USA'],
+    ['Las Vegas', 'USA'],
+    ['Boston', 'USA'],
+    ['Miami', 'USA'],
+    ['Barcelona', 'Spain'],
+    ['Madrid', 'Spain'],
+    ['Cabbage', 'Vegetable'],
+    ['Carrot', 'Vegetable'],
+    ['Cauliflower', 'Vegetable'],
+    ['Celery', 'Vegetable'],
+    ['Chard', 'Vegetable'],
+    ['Chicory', 'Vegetable'],
+    ['Corn', 'Vegetable'],
+    ['Cucumber', 'Vegetable'],
+    ['Daikon', 'Vegetable'],
+    ['Date', 'Fruit'],
+    ['Edamame', 'Vegetable'],
+    ['Eggplant', 'Vegetable'],
+    ['Elderberry', 'Fruit'],
+    ['Fennel', 'Vegetable'],
+    ['Fig', 'Fruit'],
+    ['Garlic', 'Vegetable'],
+    ['Grape', 'Fruit'],
+    ['Honeydew melon', 'Fruit'],
+    ['Iceberg lettuce', 'Vegetable'],
+    ['Jerusalem artichoke', 'Vegetable'],
+    ['Kale', 'Vegetable'],
+    ['Kiwi', 'Fruit'],
+    ['Leek', 'Vegetable'],
+    ['Lemon', 'Fruit'],
+    ['Mango', 'Fruit'],
+    ['Mangosteen', 'Fruit'],
+    ['Melon', 'Fruit'],
+    ['Mushroom', 'Fungus'],
+    ['Nectarine', 'Fruit'],
+    ['Okra', 'Vegetable'],
+    ['Olive', 'Vegetable'],
+    ['Onion', 'Vegetable'],
+    ['Orange', 'Fruit'],
+    ['Parsnip', 'Vegetable'],
+    ['Pea', 'Vegetable'],
+    ['Pear', 'Fruit'],
+    ['Pineapple', 'Fruit'],
+    ['Potato', 'Vegetable'],
+    ['Pumpkin', 'Fruit'],
+    ['Quince', 'Fruit'],
+    ['Radish', 'Vegetable'],
+    ['Rhubarb', 'Vegetable'],
+    ['Shallot', 'Vegetable'],
+    ['Spinach', 'Vegetable'],
+    ['Squash', 'Vegetable'],
+    ['Strawberry', 'Fruit'],
+    ['Sweet potato', 'Vegetable'],
+    ['Tomato', 'Fruit'],
+    ['Turnip', 'Vegetable'],
+    ['Ugli fruit', 'Fruit'],
+    ['Victoria plum', 'Fruit'],
+    ['Watercress', 'Vegetable'],
+    ['Watermelon', 'Fruit'],
+    ['Yam', 'Vegetable'],
+    ['Zucchini', 'Vegetable'],
+];
+
+function searchVeggies(searchString) {
+    var results = [];
+
+    for (var i = 0; i < COUNTRIES_AND_CITIES.length; i++) {
+        var veggie = COUNTRIES_AND_CITIES[i][0].toLowerCase();
+        if (veggie.indexOf(searchString.toLowerCase()) === 0) {
+            results.push(COUNTRIES_AND_CITIES[i]);
         }
-
-        if (flag) {
-            event.stopPropagation();
-            event.preventDefault();
-        }
     }
 
-    onComboboxClick() {
-        if (this.isOpen()) {
-            this.close(true);
-        } else {
-            this.open();
-        }
-    }
-
-    onComboboxFocus() {
-        this.filter = this.comboboxNode.value;
-        this.filterOptions();
-        this.setVisualFocusCombobox();
-        this.option = null;
-        this.setCurrentOptionStyle(null);
-    }
-
-    onComboboxBlur() {
-        this.removeVisualFocusAll();
-    }
-
-    onBackgroundPointerUp(event) {
-        if (
-            !this.comboboxNode.contains(event.target) &&
-            !this.listboxNode.contains(event.target) &&
-            !this.buttonNode.contains(event.target)
-        ) {
-            this.comboboxHasVisualFocus = false;
-            this.setCurrentOptionStyle(null);
-            this.removeVisualFocusAll();
-            setTimeout(this.close.bind(this, true), 300);
-        }
-    }
-
-    onButtonClick() {
-        if (this.isOpen()) {
-            this.close(true);
-        } else {
-            this.open();
-        }
-        this.comboboxNode.focus();
-        this.setVisualFocusCombobox();
-    }
-
-    /* Listbox Events */
-
-    onListboxPointerover() {
-        this.hasHover = true;
-    }
-
-    onListboxPointerout() {
-        this.hasHover = false;
-        setTimeout(this.close.bind(this, false), 300);
-    }
-
-    // Listbox Option Events
-
-    onOptionClick(event) {
-        this.comboboxNode.value = event.target.textContent;
-        this.close(true);
-    }
-
-    onOptionPointerover() {
-        this.hasHover = true;
-        this.open();
-    }
-
-    onOptionPointerout() {
-        this.hasHover = false;
-        setTimeout(this.close.bind(this, false), 300);
-    }
+    return results;
 }
 
-// Initialize comboboxes
-
+/**
+ * @function onload
+ * @description Initialize the combobox examples once the page has loaded
+ */
 window.addEventListener('load', function () {
-    var comboboxes = document.querySelectorAll('.combobox-list');
-
-    for (var i = 0; i < comboboxes.length; i++) {
-        var combobox = comboboxes[i];
-        var comboboxNode = combobox.querySelector('input');
-        var buttonNode = combobox.querySelector('button');
-        var listboxNode = combobox.querySelector('[role="listbox"]');
-        new ComboboxAutocomplete(comboboxNode, buttonNode, listboxNode);
-    }
+    new aria.GridCombobox(
+        document.getElementById('ex1-input'),
+        document.getElementById('ex1-grid'),
+        searchVeggies
+    );
 });
+'use strict';
+/**
+ * @namespace aria
+ */
+
+var aria = aria || {};
+
+/**
+ * @description
+ *  Key code constants
+ */
+aria.KeyCode = {
+    BACKSPACE: 8,
+    TAB: 9,
+    RETURN: 13,
+    SHIFT: 16,
+    ESC: 27,
+    SPACE: 32,
+    PAGE_UP: 33,
+    PAGE_DOWN: 34,
+    END: 35,
+    HOME: 36,
+    LEFT: 37,
+    UP: 38,
+    RIGHT: 39,
+    DOWN: 40,
+    DELETE: 46,
+};
+
+aria.Utils = aria.Utils || {};
+
+// Polyfill src https://developer.mozilla.org/en-US/docs/Web/API/Element/matches
+aria.Utils.matches = function (element, selector) {
+    if (!Element.prototype.matches) {
+        Element.prototype.matches =
+            Element.prototype.matchesSelector ||
+            Element.prototype.mozMatchesSelector ||
+            Element.prototype.msMatchesSelector ||
+            Element.prototype.oMatchesSelector ||
+            Element.prototype.webkitMatchesSelector ||
+            function (s) {
+                var matches = element.parentNode.querySelectorAll(s);
+                var i = matches.length;
+                while (--i >= 0 && matches.item(i) !== this) {
+                    // empty
+                }
+                return i > -1;
+            };
+    }
+
+    return element.matches(selector);
+};
+
+aria.Utils.remove = function (item) {
+    if (item.remove && typeof item.remove === 'function') {
+        return item.remove();
+    }
+    if (
+        item.parentNode &&
+        item.parentNode.removeChild &&
+        typeof item.parentNode.removeChild === 'function'
+    ) {
+        return item.parentNode.removeChild(item);
+    }
+    return false;
+};
+
+aria.Utils.isFocusable = function (element) {
+    if (element.tabIndex < 0) {
+        return false;
+    }
+
+    if (element.disabled) {
+        return false;
+    }
+
+    switch (element.nodeName) {
+        case 'A':
+            return !!element.href && element.rel != 'ignore';
+        case 'INPUT':
+            return element.type != 'hidden';
+        case 'BUTTON':
+        case 'SELECT':
+        case 'TEXTAREA':
+            return true;
+        default:
+            return false;
+    }
+};
+
+aria.Utils.getAncestorBySelector = function (element, selector) {
+    if (!aria.Utils.matches(element, selector + ' ' + element.tagName)) {
+        // Element is not inside an element that matches selector
+        return null;
+    }
+
+    // Move up the DOM tree until a parent matching the selector is found
+    var currentNode = element;
+    var ancestor = null;
+    while (ancestor === null) {
+        if (aria.Utils.matches(currentNode.parentNode, selector)) {
+            ancestor = currentNode.parentNode;
+        } else {
+            currentNode = currentNode.parentNode;
+        }
+    }
+
+    return ancestor;
+};
+
+aria.Utils.hasClass = function (element, className) {
+    return new RegExp('(\\s|^)' + className + '(\\s|$)').test(element.className);
+};
+
+aria.Utils.addClass = function (element, className) {
+    if (!aria.Utils.hasClass(element, className)) {
+        element.className += ' ' + className;
+    }
+};
+
+aria.Utils.removeClass = function (element, className) {
+    var classRegex = new RegExp('(\\s|^)' + className + '(\\s|$)');
+    element.className = element.className.replace(classRegex, ' ').trim();
+};
+
+aria.Utils.bindMethods = function (object /* , ...methodNames */) {
+    var methodNames = Array.prototype.slice.call(arguments, 1);
+    methodNames.forEach(function (method) {
+        object[method] = object[method].bind(object);
+    });
+};
