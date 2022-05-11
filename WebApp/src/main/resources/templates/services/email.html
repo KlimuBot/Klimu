@@ -20,43 +20,18 @@
     <div class="ms-3 my-3">
 
         <div>
-            <div id="ubicacion">
+            <div id="ubicacion" class="text-center mb-3">
                 <label class="title">1: AÑADIR UBICACION*</label>
-                <!--<div class="text-center">
-                    <input class="mx-5 my-2 py-1 bck-g w-50" type="text" />
-
-                </div>-->
-                <label for="cb1-input">Ubicacion</label>
-                <div class="combobox combobox-list text-center">
-                    <div class="group">
-                        <input id="cb1-input mx-5 my-2 py-1 bck-g w-50" class="cb_edit" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="cb1-listbox">
-                        <button id="cb1-button" tabindex="-1" aria-label="States" aria-expanded="false" aria-controls="cb1-listbox">
-                            <svg width="18" height="16" aria-hidden="true" focusable="false" style="forced-color-adjust: auto">
-                                <polygon class="arrow" stroke-width="0" fill-opacity="0.75" fill="currentColor" points="3,6 15,6 9,14"></polygon>
-                            </svg>
-                        </button>
+                <div class="combobox-wrapper mb-2">
+                    <div id="ex1-combobox">
+                        <input type="text" role="combobox" aria-haspopup="grid" aria-expanded="false" aria-autocomplete="list" aria-controls="ex1-grid" id="ex1-input">
                     </div>
-                    <ul id="cb1-listbox" role="listbox" aria-label="States">
-                        <li id="lb1-al" role="option">Alabama</li>
-                        <li id="lb1-ak" role="option">Alaska</li>
-                        <li id="lb1-as" role="option">American Samoa</li>
-                        <li id="lb1-az" role="option">Arizona</li>
-                        <li id="lb1-ar" role="option">Arkansas</li>
-                        <li id="lb1-ca" role="option">California</li>
-                        <li id="lb1-co" role="option">Colorado</li>
-                        <li id="lb1-ct" role="option">Connecticut</li>
-                        <li id="lb1-de" role="option">Delaware</li>
-                        <li id="lb1-dc" role="option">District of Columbia</li>
-                        <li id="lb1-fl" role="option">Florida</li>
-                        <li id="lb1-ga" role="option">Georgia</li>
-                        <li id="lb1-gm" role="option">Guam</li>
-                        <li id="lb1-hi" role="option">Hawaii</li>
-                        <li id="lb1-id" role="option">Idaho</li>
-                    </ul>
+                    <div aria-labelledby="ex1-label" role="grid" id="ex1-grid" class="grid hidden">
+                    </div>
                 </div>
             </div>
-            <div class="mb-3">
-                <label class="title">2: SELECCIONAR ALERTAS*</label>
+            <div id="seleccion-alertas" class="mb-3">
+                <label class="title text-center">2: SELECCIONAR ALERTAS*</label>
                 <div class="alertas mx-4 mt-2 row">
                     <div class="p-2 col-sm-6" id="alertas_diarias">
                         <div class="d-flex_g align-items-center">

@@ -97,102 +97,93 @@ span {
 
 /* COMBOBOX  */
 
-.combobox-list {
+.hidden {
+    display: none;
+}
+
+.combobox-wrapper {
+    display: inline-block;
     position: relative;
+    font-size: 16px;
+    margin-top: 15px;
 }
 
-.combobox .group {
-    display: inline-flex;
-    padding: 4px;
-    cursor: pointer;
+.combobox-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 5px;
 }
 
-.combobox input,
-.combobox button {
-    background-color: white;
-    color: black;
-    box-sizing: border-box;
-    height: 24px;
-    padding: 0;
-    margin: 0;
-    vertical-align: bottom;
-    border: 1px solid gray;
-    position: relative;
-    cursor: pointer;
-}
-
-.combobox input {
-    width: 150px;
-    border-right: none;
-    outline: none;
-    font-size: 87.5%;
-    padding: 1px 3px;
-}
-
-.combobox button {
-    width: 19px;
-    border-left: none;
-    outline: none;
-    color: rgb(56, 182, 0);
-}
-
-.combobox button[aria-expanded="true"] svg {
-    transform: rotate(180deg) translate(0, -3px);
-}
-
-ul[role="listbox"] {
+.listbox,
+.grid {
+    min-width: 230px;
+    background: white;
+    border: 1px solid #ccc;
+    list-style: none;
     margin: 0;
     padding: 0;
     position: absolute;
-    left: 4px;
-    top: 28px;
-    list-style: none;
-    background-color: white;
-    display: none;
-    box-sizing: border-box;
-    border: 2px currentColor solid;
-    max-height: 250px;
-    width: 168px;
-    overflow: scroll;
-    overflow-x: hidden;
-    font-size: 87.5%;
-    cursor: pointer;
+    top: 1.7em;
+    z-index: 1;
 }
 
-ul[role="listbox"] li[role="option"] {
+.listbox .result {
+    cursor: default;
     margin: 0;
-    display: block;
-    padding-left: 3px;
-    padding-top: 2px;
-    padding-bottom: 2px;
 }
 
-/* focus and hover styling */
-
-.combobox .group.focus,
-.combobox .group:hover {
+.grid .result-row {
     padding: 2px;
-    border: 2px solid currentColor;
-    border-radius: 4px;
+    cursor: default;
+    margin: 0;
 }
 
-.combobox .group.focus polygon,
-.combobox .group:hover polygon {
-    fill-opacity: 1;
+.listbox .result:hover,
+.grid .result-row:hover {
+    background: rgb(139 189 225);
 }
 
-.combobox .group.focus input,
-.combobox .group.focus button,
-.combobox .group input:hover,
-.combobox .group button:hover {
-    background-color: #def;
+.listbox .focused,
+.grid .focused {
+    background: rgb(139 189 225);
 }
 
-[role="listbox"].focus [role="option"][aria-selected="true"],
-[role="listbox"] [role="option"]:hover {
-    background-color: #bdbdbd;
-    padding-top: 0;
-    padding-bottom: 0;
-    border-top: 2px solid currentColor;
-    border-bottom: 2px solid currentColor;
+.grid .focused-cell {
+    outline-style: dotted;
+    outline-color: green;
 }
+
+.combobox-wrapper input {
+    font-size: inherit;
+    border: 1px solid #aaa;
+    border-radius: 2px;
+    line-height: 1.5em;
+    padding-right: 30px;
+    width: 200px;
+}
+
+.combobox-dropdown {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 0 0 2px;
+    height: 1.5em;
+    border-radius: 0 2px 2px 0;
+    border: 1px solid #aaa;
+}
+
+.grid .result-cell {
+    display: inline-block;
+    cursor: default;
+    margin: 0;
+    padding: 0 5px;
+}
+
+.grid .result-cell:last-child {
+    float: right;
+    font-size: 12px;
+    font-weight: 200;
+    color: #333;
+    line-height: 24px;
+}
+
