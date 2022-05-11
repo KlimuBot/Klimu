@@ -10,7 +10,10 @@
 
 <!-- Main -->
 <div class="cont">
-    <img  th:src="@{'/media/img/klimu_title.png'}" alt="KLIMU Logo" class="logo_title">
+    <a th:href="@{'/home'}" class="d-flex justify-content-center">
+        <img  th:src="@{'/media/img/klimu_title.png'}" alt="KLIMU Logo" class="logo_title">
+    </a>
+
     <h2>Sign-up</h2>
 
 
@@ -26,19 +29,19 @@
         </div>
         <div class="div4 conjunto">
             <h3>EMAIL</h3>
-            <input type="text" class="input_texto">
+            <input type="email" class="input_texto">
         </div>
         <div class="div5 conjunto">
             <h3>TELEFONO</h3>
-            <input type="text" class="input_texto">
+            <input type="tel" class="input_texto">
         </div>
         <div class="div6 conjunto">
             <h3>USERNAME</h3>
             <input type="text" class="input_texto">
         </div>
         <div class="div7 conjunto">
-            <h3>PASSWORD</h3>
-            <input type="text" class="input_texto">
+            <h3>CONTRASEÑA</h3>
+            <input type="password" class="input_texto">
         </div>
 
         <div class="div3">

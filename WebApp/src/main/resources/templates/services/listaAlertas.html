@@ -11,7 +11,9 @@
     <div class="todo">
         <div class="left">
             <div class="text-center">
+                <a th:href="@{'/home'}" class="d-flex justify-content-center">
                 <img th:src="@{'/media/img/klimu_title.png'}" alt="KLIMU" class="logo img-fluid">
+                </a>
             </div>
             <div class="suscripciones d-flex justify-content-around px-3 ">
                 <a th:href="@{'/subscription'}" class="text-center subscription_box parent">
@@ -32,7 +34,7 @@
                 </a>
             </div>
             <div class="py-4 unsuscribe w-100 text-center">
-                <a id="unsuscribe" href="#">UNSUSCRIBE?</a>
+                <a id="unsuscribe" href="#">UNSUBSCRIBE?</a>
             </div>
         </div>
         <div class="right">

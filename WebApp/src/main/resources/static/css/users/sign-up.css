@@ -42,6 +42,8 @@ body{
 }
 .parent{
     width: 80%;
+    border: solid #4BCC78;
+    padding: 2rem;
 }
 .parent > div {
     margin: 0.2rem;
@@ -62,12 +64,15 @@ body{
     align-items: center;
     justify-content: center;
 
-    width: 60%;
+
     height: 4.5rem;
     text-decoration: none;
 }
 .div3{
     margin-top: 1rem !important;
+}
+.div1{
+    font-size: x-large;
 }
 
 @media (min-width: 992px) {
@@ -85,7 +90,7 @@ body{
     }
 
     .div1 { grid-area: 1 / 1 / 2 / 4; }
-    .div2 { grid-area: 1 / 6 / 2 / 11; }
+    .div2 { grid-area: 1 / 7 / 4 / 11; }
     .div3 {
         grid-area: 4 / 4 / 5 / 8;
         display: flex;
@@ -96,8 +101,8 @@ body{
         width: 20%;
     }
     .div4 { grid-area: 2 / 1 / 3 / 6; }
-    .div5 { grid-area: 2 / 8 / 3 / 11; }
-    .div6 { grid-area: 3 / 1 / 4 / 5; }
+    .div5 { grid-area: 2 / 7 / 4 / 11; }
+    .div6 { grid-area: 3 / 1 / 4 / 4; }
     .div7 { grid-area: 3 / 7 / 4 / 11; }
 
 }
