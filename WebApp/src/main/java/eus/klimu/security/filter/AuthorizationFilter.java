@@ -25,7 +25,8 @@ public class AuthorizationFilter extends OncePerRequestFilter {
                 !request.getServletPath().startsWith("/js") &&
                 !request.getServletPath().startsWith("/media") &&
                 !request.getServletPath().startsWith("/login") &&
-                !request.getServletPath().equals("/user/create")
+                !request.getServletPath().equals("/user/create")&&
+                !request.getServletPath().equals("/login/sign-up")
         ) {
             HttpSession session = request.getSession();
             TokenManagement tokenManagement = new TokenManagement();

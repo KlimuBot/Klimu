@@ -33,6 +33,7 @@ public class HomeController {
         return "users/login";
     }
 
+
     @GetMapping("/logout")
     public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
@@ -67,5 +68,24 @@ public class HomeController {
     public String subscription() {
         return "services/suscripciones";
     }
-}
+
+    /*@GetMapping("/login/sign-up")
+    public String signUp() {
+        return "users/create_user";*/
+
+    @GetMapping("/login/sign-up")
+    public String getSignUpPage(
+            Model model,
+            @RequestParam(value = "error", required = false) String error
+    ) {
+        if (error != null && error.length() > 1) {
+            model.addAttribute("errorMsg", error);
+        }
+        else {
+            model.addAttribute("errorMsg", null);
+        }
+        return "users/create_user";
+    }
+    }
+
 

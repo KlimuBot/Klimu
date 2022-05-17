@@ -1,10 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="includes/head :: head">
+    <title id="pageTitle">KLIMU</title>
 </head>
+
 <body>
+<!-- Custom Styling -->
+<link rel="stylesheet" th:href="@{'/css/users/sign-up.css'}"/>
+
+<!-- Main -->
+<div class="cont">
+    <a th:href="@{'/home'}" class="d-flex justify-content-center">
+        <img  th:src="@{'/media/img/klimu_title.png'}" alt="KLIMU Logo" class="logo_title">
+    </a>
+
+    <h2>Sign-up</h2>
+
+
+    </a>
+    <div class="parent">
+        <div class="div1 conjunto">
+            <h3>NOMBRE</h3>
+            <input type="text" class="input_texto">
+        </div>
+        <div class="div2 conjunto">
+            <h3>APELLIDO</h3>
+            <input type="text" class="input_texto">
+        </div>
+        <div class="div4 conjunto">
+            <h3>EMAIL</h3>
+            <input type="email" class="input_texto">
+        </div>
+        <div class="div5 conjunto">
+            <h3>TELEFONO</h3>
+            <input type="tel" class="input_texto">
+        </div>
+        <div class="div6 conjunto">
+            <h3>USERNAME</h3>
+            <input type="text" class="input_texto">
+        </div>
+        <div class="div7 conjunto">
+            <h3>CONTRASEÑA</h3>
+            <input type="password" class="input_texto">
+        </div>
+
+        <div class="div3">
+            <a th:href="@{/subscription}" class="text-center subscription_box">
+                <button class="btn div1">SUBSCRIBE NOW</button>
+                <img th:src="@{'/media/svg/arrow.svg'}" alt="flecha" class="div2">
+                </a>
+        </div>
+
+    </div>
+
+</div>
 
 </body>
 </html>
