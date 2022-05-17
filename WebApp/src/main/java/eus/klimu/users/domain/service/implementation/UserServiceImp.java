@@ -5,6 +5,10 @@ import eus.klimu.users.domain.repository.UserRepository;
 import eus.klimu.users.domain.service.definition.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +16,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +30,11 @@ import java.util.Collection;
 @Transactional
 @RequiredArgsConstructor
 public class UserServiceImp implements UserService, UserDetailsService {
+
+    private static final String SERVER_URL = "http://localhost:8080/login/grant-access";
+
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final HttpSession session;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
