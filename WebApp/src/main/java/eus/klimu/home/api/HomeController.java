@@ -14,6 +14,8 @@ import java.io.IOException;
 @Controller
 public class HomeController {
 
+    private static final String ERROR_MSG = "errorMsg";
+
     @GetMapping(path = {"/", "/index", "/home"})
     public String index() {
         return "index";
@@ -22,17 +24,30 @@ public class HomeController {
     @GetMapping("/login/sign-in")
     public String getLoginPage(
             Model model,
-            @RequestParam(value = "error", required = false) String error
+            @RequestHeader(value = "errorMsg", required = false) String error
     ) {
         if (error != null && error.length() > 1) {
-            model.addAttribute("errorMsg", error);
+            model.addAttribute(ERROR_MSG, error);
         }
         else {
-            model.addAttribute("errorMsg", null);
+            model.addAttribute(ERROR_MSG, null);
         }
         return "users/login";
     }
 
+    @GetMapping("/login/sign-up")
+    public String getSignUpPage(
+            Model model,
+            @RequestParam(value = "error", required = false) String error
+    ) {
+        if (error != null && error.length() > 1) {
+            model.addAttribute(ERROR_MSG, error);
+        }
+        else {
+            model.addAttribute(ERROR_MSG, null);
+        }
+        return "users/create_user";
+    }
 
     @GetMapping("/logout")
     public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -68,24 +83,4 @@ public class HomeController {
     public String subscription() {
         return "services/suscripciones";
     }
-
-    /*@GetMapping("/login/sign-up")
-    public String signUp() {
-        return "users/create_user";*/
-
-    @GetMapping("/login/sign-up")
-    public String getSignUpPage(
-            Model model,
-            @RequestParam(value = "error", required = false) String error
-    ) {
-        if (error != null && error.length() > 1) {
-            model.addAttribute("errorMsg", error);
-        }
-        else {
-            model.addAttribute("errorMsg", null);
-        }
-        return "users/create_user";
-    }
-    }
-
-
+}

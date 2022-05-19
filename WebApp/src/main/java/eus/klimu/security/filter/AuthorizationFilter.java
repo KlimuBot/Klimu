@@ -32,13 +32,13 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             TokenManagement tokenManagement = new TokenManagement();
 
             // Check the access token.
-            String accessToken = (String) session.getAttribute("accessToken");
+            String accessToken = (String) session.getAttribute(TokenManagement.ACCESS_TOKEN);
             if (accessToken != null && accessToken.startsWith(TokenManagement.TOKEN_SIGNATURE_NAME)) {
                 try {
                     UsernamePasswordAuthenticationToken authToken = tokenManagement.getUsernamePasswordToken(accessToken);
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 } catch (Exception accessException) {
-                    String refreshToken = (String) session.getAttribute("refreshToken");
+                    String refreshToken = (String) session.getAttribute(TokenManagement.REFRESH_TOKEN);
                     try {
                         UsernamePasswordAuthenticationToken authToken = tokenManagement.getUsernamePasswordToken(refreshToken);
                         SecurityContextHolder.getContext().setAuthentication(authToken);
