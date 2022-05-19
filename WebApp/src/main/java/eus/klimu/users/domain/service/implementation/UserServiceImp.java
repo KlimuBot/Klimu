@@ -1,14 +1,12 @@
 package eus.klimu.users.domain.service.implementation;
 
+import eus.klimu.security.TokenManagement;
 import eus.klimu.users.domain.model.AppUser;
 import eus.klimu.users.domain.repository.UserRepository;
 import eus.klimu.users.domain.service.definition.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,7 +29,8 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class UserServiceImp implements UserService, UserDetailsService {
 
-    private static final String SERVER_URL = "http://localhost:8080/RestAPI/user";
+    private static final String SERVER_LOGIN_URL = "http://localhost:8080/RestAPI/login";
+    private static final String SERVER_USER_URL = "http://localhost:8080/RestAPI/user/";
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final HttpSession session;
@@ -52,26 +51,40 @@ public class UserServiceImp implements UserService, UserDetailsService {
             map.add("password", password);
 
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
-            ResponseEntity<AppUser> response = restTemplate.getForEntity(SERVER_URL, AppUser.class, request);
+            ResponseEntity<Void> response = restTemplate.postForEntity(SERVER_LOGIN_URL, request, Void.class);
 
-            if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-                AppUser user = response.getBody();
+            if (response.getStatusCode().is2xxSuccessful()) {
+                String accessToken = request.getHeaders().getValuesAsList(TokenManagement.ACCESS_TOKEN).get(0);
+                String refreshToken = request.getHeaders().getValuesAsList(TokenManagement.REFRESH_TOKEN).get(0);
 
-                if (user != null) {
-                    log.info("User {} found on the database", username);
+                if (accessToken != null && refreshToken != null) {
+                    headers.add(TokenManagement.ACCESS_TOKEN, accessToken);
+                    headers.add(TokenManagement.REFRESH_TOKEN, refreshToken);
 
-                    // Get the user roles as SimpleGrantedAuthorities for Spring Security.
-                    Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-                    if (user.getRoles() != null && !user.getRoles().isEmpty()) {
-                        user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
+                    HttpEntity<String> userRequest = new HttpEntity<>(headers);
+                    ResponseEntity<AppUser> appUserResponse =
+                            restTemplate.getForEntity(SERVER_USER_URL + username, AppUser.class, userRequest);
+
+                    if (appUserResponse.getStatusCode().is2xxSuccessful() && appUserResponse.hasBody()) {
+                        AppUser user = appUserResponse.getBody();
+
+                        if (user != null) {
+                            log.info("User {} found on the database", username);
+
+                            // Get the user roles as SimpleGrantedAuthorities for Spring Security.
+                            Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                            if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+                                user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
+                            }
+
+                            // Create a Spring Security user to check on with.
+                            return new User(
+                                    user.getUsername(),
+                                    user.getPassword(),
+                                    authorities
+                            );
+                        }
                     }
-
-                    // Create a Spring Security user to check on with.
-                    return new User(
-                            user.getUsername(),
-                            user.getPassword(),
-                            authorities
-                    );
                 }
             }
         }
