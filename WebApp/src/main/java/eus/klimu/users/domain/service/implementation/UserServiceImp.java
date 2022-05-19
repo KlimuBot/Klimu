@@ -31,7 +31,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class UserServiceImp implements UserService, UserDetailsService {
 
-    private static final String SERVER_URL = "http://localhost:8080/login/grant-access";
+    private static final String SERVER_URL = "http://localhost:8080/RestAPI/user";
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final HttpSession session;
@@ -41,25 +41,42 @@ public class UserServiceImp implements UserService, UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        AppUser user = userRepository.findByUsername(username);
+        String password = (String) session.getAttribute("password");
 
-        if (user != null) {
-            log.info("User {} found on the database", username);
+        if (username != null && password != null) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-            // Get the user roles as SimpleGrantedAuthorities for Spring Security.
-            Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-            user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
+            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+            map.add("username", username);
+            map.add("password", password);
 
-            // Create a Spring Security user to check on with.
-            return new User(
-                    user.getUsername(),
-                    user.getPassword(),
-                    authorities
-            );
-        } else {
-            log.error("User with username {} couldn't be found", username);
-            throw new UsernameNotFoundException("User with username" + username + "couldn't be found");
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+            ResponseEntity<AppUser> response = restTemplate.getForEntity(SERVER_URL, AppUser.class, request);
+
+            if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
+                AppUser user = response.getBody();
+
+                if (user != null) {
+                    log.info("User {} found on the database", username);
+
+                    // Get the user roles as SimpleGrantedAuthorities for Spring Security.
+                    Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                    if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+                        user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
+                    }
+
+                    // Create a Spring Security user to check on with.
+                    return new User(
+                            user.getUsername(),
+                            user.getPassword(),
+                            authorities
+                    );
+                }
+            }
         }
+        log.error("User with username {} couldn't be found", username);
+        throw new UsernameNotFoundException("User with username" + username + "couldn't be found");
     }
 
     @Override

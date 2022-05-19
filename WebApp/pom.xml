@@ -71,7 +71,7 @@
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
-            <version>3.19.1</version>
+            <version>3.19.2</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -81,6 +81,7 @@
     </dependencies>
 
     <build>
+        <finalName>ROOT</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -92,6 +93,17 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <update>true</update>
+                    <server>maven-tomcat-war-deployment-server</server>
+                    <url>http://klimu.eus/manager/text</url>
+                    <path>/${project.build.finalName}</path>
                 </configuration>
             </plugin>
         </plugins>
