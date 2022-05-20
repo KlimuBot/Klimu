@@ -6,6 +6,7 @@ import eus.klimu.users.domain.repository.UserRepository;
 import eus.klimu.users.domain.service.definition.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -29,8 +30,8 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class UserServiceImp implements UserService, UserDetailsService {
 
-    private static final String SERVER_LOGIN_URL = "http://localhost:8080/RestAPI/login";
-    private static final String SERVER_USER_URL = "http://localhost:8080/RestAPI/user/";
+    private static final String SERVER_LOGIN_URL = "http://klimu.eus/RestAPI/login";
+    private static final String SERVER_USER_URL = "http://klimu.eus/RestAPI/user/";
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final HttpSession session;
@@ -51,20 +52,23 @@ public class UserServiceImp implements UserService, UserDetailsService {
             map.add("password", password);
 
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
-            ResponseEntity<Void> response = restTemplate.postForEntity(SERVER_LOGIN_URL, request, Void.class);
+            ResponseEntity<JSONObject> response = restTemplate.postForEntity(SERVER_LOGIN_URL, request, JSONObject.class);
 
-            if (response.getStatusCode().is2xxSuccessful()) {
-                String accessToken = request.getHeaders().getValuesAsList(TokenManagement.ACCESS_TOKEN).get(0);
-                String refreshToken = request.getHeaders().getValuesAsList(TokenManagement.REFRESH_TOKEN).get(0);
+            if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
+                JSONObject body = response.getBody();
 
-                if (accessToken != null && refreshToken != null) {
-                    headers.add(TokenManagement.ACCESS_TOKEN, accessToken);
-                    headers.add(TokenManagement.REFRESH_TOKEN, refreshToken);
+                // Check if the response body contains the tokens.
+                if (body != null && body.has(TokenManagement.ACCESS_TOKEN) && body.has(TokenManagement.REFRESH_TOKEN)) {
+                    // Put the tokens as headers for the request.
+                    headers.add(TokenManagement.ACCESS_TOKEN, body.getString(TokenManagement.ACCESS_TOKEN));
+                    headers.add(TokenManagement.REFRESH_TOKEN, body.getString(TokenManagement.REFRESH_TOKEN));
 
+                    // Get the user from the request.
                     HttpEntity<String> userRequest = new HttpEntity<>(headers);
                     ResponseEntity<AppUser> appUserResponse =
                             restTemplate.getForEntity(SERVER_USER_URL + username, AppUser.class, userRequest);
 
+                    // Check if the user was found.
                     if (appUserResponse.getStatusCode().is2xxSuccessful() && appUserResponse.hasBody()) {
                         AppUser user = appUserResponse.getBody();
 

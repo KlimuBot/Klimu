@@ -6,6 +6,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,9 +19,7 @@ import org.springframework.util.MultiValueMap;
 
 import javax.servlet.http.HttpSession;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.stream;
@@ -44,6 +43,8 @@ public class TokenManagement {
     public static final String ACCESS_TOKEN = "accessToken";
     public static final String REFRESH_TOKEN = "refreshToken";
 
+    private static final String ROLES = "roles";
+
     private final Algorithm algorithm;
     private final JWTVerifier verifier;
 
@@ -56,6 +57,7 @@ public class TokenManagement {
     public HttpEntity<MultiValueMap<String, String>> generateHttpRequest(String username, String password) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("username", username);
@@ -69,7 +71,7 @@ public class TokenManagement {
                 .withSubject(user.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + durationTime))
                 .withIssuer(requestURL)
-                .withClaim("roles", user.getAuthorities().stream()
+                .withClaim(ROLES, user.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
     }
@@ -80,12 +82,21 @@ public class TokenManagement {
         log.info("The user has been authenticated, their tokens have been generated");
     }
 
+    public JSONObject getTokensAsJSON(String accessToken, String refreshToken) {
+        JSONObject json = new JSONObject();
+
+        json.append(TokenManagement.ACCESS_TOKEN, accessToken);
+        json.append(TokenManagement.REFRESH_TOKEN, refreshToken);
+
+        return json;
+    }
+
     public UsernamePasswordAuthenticationToken getUsernamePasswordToken(String authToken) throws JWTVerificationException {
         String token = authToken.substring(TOKEN_SIGNATURE_NAME.length());
         DecodedJWT decodedJWT = verifier.verify(token);
 
         String username = decodedJWT.getSubject();
-        String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
+        String[] roles = decodedJWT.getClaim(ROLES).asArray(String.class);
 
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         stream(roles).forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));
@@ -100,7 +111,7 @@ public class TokenManagement {
         DecodedJWT decodedJWT = verifier.verify(token);
 
         String username = decodedJWT.getSubject();
-        Collection<String> roles = decodedJWT.getClaim("roles").asList(String.class);
+        Collection<String> roles = decodedJWT.getClaim(ROLES).asList(String.class);
 
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         roles.forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));

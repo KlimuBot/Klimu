@@ -2,9 +2,12 @@ package eus.klimu.security.filter;
 
 import eus.klimu.security.TokenManagement;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -16,6 +19,11 @@ import java.io.IOException;
 
 @Slf4j
 public class AuthorizationFilter extends OncePerRequestFilter {
+
+    private static final String REFRESH_URL = "http://klimu.eus/RestAPI/access/refresh";
+    private static final String ERROR_MSG = "errorMsg";
+
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -44,14 +52,31 @@ public class AuthorizationFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authToken);
 
                         // Generate a new access and refresh token for the user.
-                        User user = tokenManagement.getUserFromToken(refreshToken);
-                        tokenManagement.setTokenOnSession(
-                                tokenManagement.generateToken(user, request.getRequestURL().toString(), TokenManagement.ACCESS_TIME),
-                                tokenManagement.generateToken(user, request.getRequestURL().toString(), TokenManagement.REFRESH_TIME),
-                                request.getSession()
+                        String json = tokenManagement.getTokensAsJSON(accessToken, refreshToken).toString();
+                        ResponseEntity<JSONObject> refreshResponse = restTemplate.getForEntity(
+                                REFRESH_URL, JSONObject.class, json
                         );
+                        if (refreshResponse.getStatusCode().is2xxSuccessful() && refreshResponse.hasBody()) {
+                            JSONObject tokens = refreshResponse.getBody();
+
+                            if (
+                                    tokens != null && tokens.has(TokenManagement.ACCESS_TOKEN) &&
+                                    tokens.has(TokenManagement.REFRESH_TOKEN)
+                            ) {
+                                tokenManagement.setTokenOnSession(
+                                        tokens.getString(TokenManagement.ACCESS_TOKEN),
+                                        tokens.getString(TokenManagement.REFRESH_TOKEN),
+                                        session
+                                );
+                            }
+                            else if (tokens != null && tokens.has(ERROR_MSG)) {
+                                throw new ServletException(tokens.getString(ERROR_MSG));
+                            } else {
+                                throw new ServletException("Could not refresh the tokens");
+                            }
+                        }
                     } catch (Exception refreshException) {
-                        response.setHeader("error", refreshException.getMessage());
+                        response.setHeader(ERROR_MSG, refreshException.getMessage());
                         response.sendError(HttpServletResponse.SC_FORBIDDEN);
                     }
                 }
