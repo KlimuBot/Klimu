@@ -1,13 +1,12 @@
 package eus.klimu.security.filter;
 
+import eus.klimu.home.api.RequestMaker;
 import eus.klimu.security.TokenManagement;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -20,17 +19,14 @@ import java.io.IOException;
 @Slf4j
 public class AuthorizationFilter extends OncePerRequestFilter {
 
-    private static final String REFRESH_URL = "http://klimu.eus/RestAPI/access/refresh";
-    private static final String ERROR_MSG = "errorMsg";
-
-    private final RestTemplate restTemplate = new RestTemplate();
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        boolean error = false;
         if (
                 !request.getServletPath().startsWith("/css") &&
                 !request.getServletPath().startsWith("/js") &&
+                !request.getServletPath().equals("/") &&
                 !request.getServletPath().startsWith("/media") &&
                 !request.getServletPath().startsWith("/login") &&
                 !request.getServletPath().equals("/user/create")&&
@@ -43,25 +39,26 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             String accessToken = (String) session.getAttribute(TokenManagement.ACCESS_TOKEN);
             if (accessToken != null && accessToken.startsWith(TokenManagement.TOKEN_SIGNATURE_NAME)) {
                 try {
-                    UsernamePasswordAuthenticationToken authToken = tokenManagement.getUsernamePasswordToken(accessToken);
+                    UsernamePasswordAuthenticationToken authToken = tokenManagement
+                            .getUsernamePasswordToken(session, accessToken);
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 } catch (Exception accessException) {
                     String refreshToken = (String) session.getAttribute(TokenManagement.REFRESH_TOKEN);
                     try {
-                        UsernamePasswordAuthenticationToken authToken = tokenManagement.getUsernamePasswordToken(refreshToken);
+                        UsernamePasswordAuthenticationToken authToken = tokenManagement
+                                .getUsernamePasswordToken(session, refreshToken);
                         SecurityContextHolder.getContext().setAuthentication(authToken);
 
                         // Generate a new access and refresh token for the user.
                         String json = tokenManagement.getTokensAsJSON(accessToken, refreshToken).toString();
-                        ResponseEntity<JSONObject> refreshResponse = restTemplate.getForEntity(
-                                REFRESH_URL, JSONObject.class, json
-                        );
+                        ResponseEntity<JSONObject> refreshResponse = new RequestMaker().doGetJSON(RequestMaker.REFRESH_URL, json);
+
                         if (refreshResponse.getStatusCode().is2xxSuccessful() && refreshResponse.hasBody()) {
                             JSONObject tokens = refreshResponse.getBody();
 
                             if (
-                                    tokens != null && tokens.has(TokenManagement.ACCESS_TOKEN) &&
-                                    tokens.has(TokenManagement.REFRESH_TOKEN)
+                                tokens != null && tokens.has(TokenManagement.ACCESS_TOKEN) &&
+                                tokens.has(TokenManagement.REFRESH_TOKEN)
                             ) {
                                 tokenManagement.setTokenOnSession(
                                         tokens.getString(TokenManagement.ACCESS_TOKEN),
@@ -69,20 +66,23 @@ public class AuthorizationFilter extends OncePerRequestFilter {
                                         session
                                 );
                             }
-                            else if (tokens != null && tokens.has(ERROR_MSG)) {
-                                throw new ServletException(tokens.getString(ERROR_MSG));
+                            else if (tokens != null && tokens.has(RequestMaker.ERROR_MSG)) {
+                                throw new ServletException(tokens.getString(RequestMaker.ERROR_MSG));
                             } else {
                                 throw new ServletException("Could not refresh the tokens");
                             }
                         }
                     } catch (Exception refreshException) {
-                        response.setHeader(ERROR_MSG, refreshException.getMessage());
+                        response.setHeader(RequestMaker.ERROR_MSG, refreshException.getMessage());
                         response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                        error = true;
                     }
                 }
             }
         }
-        filterChain.doFilter(request, response);
+        if (!error) {
+            filterChain.doFilter(request, response);
+        }
     }
 
 }

@@ -1,5 +1,7 @@
 package eus.klimu.users.domain.service.implementation;
 
+import com.google.gson.Gson;
+import eus.klimu.home.api.RequestMaker;
 import eus.klimu.security.TokenManagement;
 import eus.klimu.users.domain.model.AppUser;
 import eus.klimu.users.domain.repository.UserRepository;
@@ -15,9 +17,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClientException;
 
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
@@ -30,66 +31,72 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class UserServiceImp implements UserService, UserDetailsService {
 
-    private static final String SERVER_LOGIN_URL = "http://klimu.eus/RestAPI/login";
-    private static final String SERVER_USER_URL = "http://klimu.eus/RestAPI/user/";
-
-    private final RestTemplate restTemplate = new RestTemplate();
     private final HttpSession session;
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    private final RequestMaker requestMaker = new RequestMaker();
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         String password = (String) session.getAttribute("password");
 
         if (username != null && password != null) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            try {
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-            map.add("username", username);
-            map.add("password", password);
+                MultiValueMap<String, String> requestBody = requestMaker.generateBody(username, password);
+                ResponseEntity<String> response = requestMaker.doPost(RequestMaker.SERVER_LOGIN_URL, headers, requestBody);
 
-            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
-            ResponseEntity<JSONObject> response = restTemplate.postForEntity(SERVER_LOGIN_URL, request, JSONObject.class);
+                if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
+                    JSONObject responseBody = new JSONObject(response.getBody());
 
-            if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-                JSONObject body = response.getBody();
+                    // Check if the response body contains the tokens.
+                    if (responseBody.has(TokenManagement.ACCESS_TOKEN) && responseBody.has(TokenManagement.REFRESH_TOKEN)) {
+                        // Put the tokens as headers for the request.
+                        headers = requestMaker.addTokenToHeader(
+                                new HttpHeaders(),
+                                responseBody.getString(TokenManagement.ACCESS_TOKEN),
+                                responseBody.getString(TokenManagement.REFRESH_TOKEN)
+                        );
+                        // Get the user from the request.
+                        ResponseEntity<String> appUserResponse = requestMaker
+                                .doGet(RequestMaker.SERVER_USER_URL + username, headers, null);
 
-                // Check if the response body contains the tokens.
-                if (body != null && body.has(TokenManagement.ACCESS_TOKEN) && body.has(TokenManagement.REFRESH_TOKEN)) {
-                    // Put the tokens as headers for the request.
-                    headers.add(TokenManagement.ACCESS_TOKEN, body.getString(TokenManagement.ACCESS_TOKEN));
-                    headers.add(TokenManagement.REFRESH_TOKEN, body.getString(TokenManagement.REFRESH_TOKEN));
+                        // Check if the user was found.
+                        if (appUserResponse.getStatusCode().is2xxSuccessful() && appUserResponse.hasBody()) {
+                            AppUser user = new Gson().fromJson(appUserResponse.getBody(), AppUser.class);
 
-                    // Get the user from the request.
-                    HttpEntity<String> userRequest = new HttpEntity<>(headers);
-                    ResponseEntity<AppUser> appUserResponse =
-                            restTemplate.getForEntity(SERVER_USER_URL + username, AppUser.class, userRequest);
+                            if (user != null) {
+                                log.info("User {} found on the database", username);
 
-                    // Check if the user was found.
-                    if (appUserResponse.getStatusCode().is2xxSuccessful() && appUserResponse.hasBody()) {
-                        AppUser user = appUserResponse.getBody();
+                                // Get the user roles as SimpleGrantedAuthorities for Spring Security.
+                                Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                                if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+                                    user.getRoles().forEach(role -> authorities.add(
+                                            new SimpleGrantedAuthority(role.getName())
+                                    ));
+                                }
 
-                        if (user != null) {
-                            log.info("User {} found on the database", username);
-
-                            // Get the user roles as SimpleGrantedAuthorities for Spring Security.
-                            Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-                            if (user.getRoles() != null && !user.getRoles().isEmpty()) {
-                                user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
+                                // Create a Spring Security user to check on with.
+                                return new User(
+                                        user.getUsername(),
+                                        user.getPassword(),
+                                        authorities
+                                );
                             }
-
-                            // Create a Spring Security user to check on with.
-                            return new User(
-                                    user.getUsername(),
-                                    user.getPassword(),
-                                    authorities
-                            );
+                        }
+                        JSONObject object = new JSONObject(appUserResponse.getBody());
+                        if (object.has(RequestMaker.ERROR_MSG)) {
+                            log.error(object.getString(RequestMaker.ERROR_MSG));
+                            throw new UsernameNotFoundException(object.getString(RequestMaker.ERROR_MSG));
                         }
                     }
                 }
+            } catch (RestClientException e) {
+                log.error(e.getMessage());
+                throw new UsernameNotFoundException(e.getMessage());
             }
         }
         log.error("User with username {} couldn't be found", username);

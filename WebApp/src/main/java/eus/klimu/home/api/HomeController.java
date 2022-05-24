@@ -16,7 +16,7 @@ public class HomeController {
 
     private static final String ERROR_MSG = "errorMsg";
 
-    @GetMapping(path = {"/", "/index", "/home"})
+    @GetMapping(path = "/")
     public String index() {
         return "index";
     }
