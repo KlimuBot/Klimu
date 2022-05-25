@@ -127,6 +127,23 @@ public class RequestMaker {
     }
 
     /**
+     * Make a PUT request to a specific URL.
+     * @param url The URL of the server method.
+     * @param headers The headers for the request.
+     * @param body The body for the request, can be null.
+     * @return The response from the server as a JSON object.
+     */
+    public ResponseEntity<String> doPut(String url, HttpHeaders headers, @Nullable MultiValueMap<String, String> body) {
+        if (body != null) {
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+            return restTemplate.exchange(url, HttpMethod.PUT, request, String.class);
+        } else {
+            HttpEntity<String> request = new HttpEntity<>(headers);
+            return restTemplate.exchange(url, HttpMethod.PUT, request, String.class);
+        }
+    }
+
+    /**
      * Make a DELETE request to a specific URL.
      * @param url The URL of the server method.
      * @param headers The headers for the request.

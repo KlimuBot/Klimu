@@ -82,14 +82,7 @@ public class ChannelServiceImp implements ChannelService {
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
                 ), null
         );
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            JSONArray jsonChannels = new JSONArray(response.getBody());
-            List<Channel> channels = new ArrayList<>();
-
-            jsonChannels.forEach(channel -> channels.add((gson.fromJson(channel.toString(), Channel.class))));
-            return channels;
-        }
-        return null;
+        return channelsToList(response);
     }
 
     @Override
@@ -118,14 +111,7 @@ public class ChannelServiceImp implements ChannelService {
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
                 ), gson.toJson(channels)
         );
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            JSONArray jsonChannels = new JSONArray(response.getBody());
-            List<Channel> channelResponse = new ArrayList<>();
-
-            jsonChannels.forEach(channel -> channelResponse.add(gson.fromJson(channel.toString(), Channel.class)));
-            return channelResponse;
-        }
-        return null;
+        return channelsToList(response);
     }
 
     @Override
@@ -154,6 +140,17 @@ public class ChannelServiceImp implements ChannelService {
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
                 ), gson.toJson(channel, Channel.class)
         );
-        assert response.getStatusCode().is2xxSuccessful() && response.hasBody();
+        assert response.getStatusCode().is2xxSuccessful();
+    }
+
+    private List<Channel> channelsToList(ResponseEntity<String> response) {
+        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
+            JSONArray jsonChannels = new JSONArray(response.getBody());
+            List<Channel> channelResponse = new ArrayList<>();
+
+            jsonChannels.forEach(channel -> channelResponse.add(gson.fromJson(channel.toString(), Channel.class)));
+            return channelResponse;
+        }
+        return Collections.emptyList();
     }
 }

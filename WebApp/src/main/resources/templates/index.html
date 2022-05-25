@@ -16,13 +16,18 @@
                     <div id="title" class="text-center ">
                         <img  th:src="@{'/media/img/title.jpg'}" alt="Titulo" class="title">
                     </div>
-                    <label class="py-3">KLIMU es un sistema de análisis y predicción de eventos climáticos adversos que afectan a la salud de la población.</label>
+                    <label class="py-3">
+                        KLIMU es un sistema de análisis y predicción de eventos climáticos adversos que
+                        afectan a la salud de la población.
+                    </label>
                     <img id="imagen_sol" th:src="@{'/media/img/sol_nube_rayo2.png'}" class="image-fluid w-100"/>
                 </div>
-
-                <div class="text-center subscribe w-100 px-3">
-                    <a class="btn subscribe_button w-100 py-3" th:href="@{/login/sign-in}">
-                        SUBSCRIBE NOW<span class="fas fa-arrow-right"></span>
+                <div class="container text-center subscribe w-100 px-3 m-1">
+                    <a class="row btn subscribe_button w-100 py-3 m-1" th:href="@{/channel/subscription}">
+                        <span class="col">DASHBOARD</span>
+                    </a>
+                    <a class="row btn subscribe_button w-100 py-3 m-1" th:href="@{/login/sign-up}">
+                        <span class="col">SUBSCRIBE NOW</span>
                     </a>
                 </div>
             </div>
@@ -31,12 +36,24 @@
     <div class="cont">
         <img  th:src="@{'/media/img/klimu_title.png'}" alt="KLIMU Logo" class="logo_title">
         <img  th:src="@{'/media/img/title.png'}" alt="Titulo" class="title">
-        <p class="text">KLIMU es un sistema de análisis y predicción de eventos climáticos adversos que afectan a la salud de la población. El sistema utiliza una inteligencia artificial que se encarga de clasificar estos eventos y generar alertas que son transmitidas a los usuarios.</p>
 
-        <a th:href="@{/login/sign-in}" class="text-center subscription_box parent">
-            <button class="btn div1">SUBSCRIBE NOW</button>
-            <img th:src="@{'/media/svg/arrow.svg'}" alt="flecha" class="div2">
-        </a>
+        <p class="text">
+            KLIMU es un sistema de análisis y predicción de eventos climáticos adversos que afectan a la
+            salud de la población. El sistema utiliza una inteligencia artificial que se encarga de clasificar
+            estos eventos y generar alertas que son transmitidas a los usuarios.
+        </p>
+        <span class="cont">
+            <span class="row">
+                <a th:href="@{/channel/subscription}" class="col text-center subscription_box parent m-1">
+                    <button class="btn div1">DASHBOARD</button>
+                    <img th:src="@{'/media/svg/arrow.svg'}" alt="flecha" class="div2">
+                </a>
+                <a th:href="@{/login/sign-up}" class="col text-center subscription_box parent m-1">
+                    <button class="btn div1">SUBSCRIBE NOW</button>
+                    <img th:src="@{'/media/svg/arrow.svg'}" alt="flecha" class="div2">
+                </a>
+            </span>
+        </span>
         <img th:src="@{'/media/img/grafico_funcionalidades.png'}" alt="Grafico funcionaidades" class="klimu_grafico"/>
     </div>
 </body>

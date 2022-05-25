@@ -1,32 +1,37 @@
-body{
+body {
     font-family: 'Bebas Neue', cursive;
 }
-.cont{
+
+.cont {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
-.logo_title{
+
+.logo_title {
     width: 20%;
 }
-.title{
+
+.title {
     width: 50%;
     margin: 1rem;
 }
-.klimu_grafico{
+
+.klimu_grafico {
     position: absolute;
     bottom: 0;
     right: 18%;
     width: 68%;
 }
-.text{
+
+.text {
     padding-left: 10%;
     padding-right: 10%;
     text-align: center;
 
 }
 
-.input_texto{
+.input_texto {
     height: 2.4rem;
     background-color: #EBEEE2;
     border-color: #EBEEE2;
@@ -36,42 +41,48 @@ body{
     padding: 0.3rem;
 }
 
-.conjunto{
+.conjunto {
     display: flex;
     flex-direction: column;
 }
-.parent{
+
+.parent {
     width: 80%;
     border: solid #4BCC78;
     padding: 2rem;
 }
+
 .parent > div {
     margin: 0.2rem;
 }
+
 .div3 {
     display: flex;
     justify-content: center;
     margin-top: 1rem;
 
 }
+
 .div3 > button {
     width: 20%;
 }
-.subscription_box{
+
+.subscription_box {
     background-color: #EBEEE2;
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
 
-
     height: 4.5rem;
     text-decoration: none;
 }
-.div3{
+
+.div3 {
     margin-top: 1rem !important;
 }
-.div1{
+
+.input_texto, .btn-subscribe {
     font-size: x-large;
 }
 
@@ -80,29 +91,49 @@ body{
     .parent > div {
         margin: 0;
     }
+
     .parent {
         display: grid;
-        grid-template-columns: repeat(10, 1fr);
+        grid-template-columns: repeat(11, 1fr);
         grid-template-rows: repeat(3, 0.3fr) 0.2fr;
-        grid-column-gap: 0px;
+        grid-column-gap: 0;
         grid-row-gap: 0.8rem;
         width: 80%;
     }
 
-    .div1 { grid-area: 1 / 1 / 2 / 4; }
-    .div2 { grid-area: 1 / 7 / 4 / 11; }
+    .div1 {
+        grid-area: 1 / 1 / 2 / 6;
+    }
+
+    .div2 {
+        grid-area: 1 / 7 / 4 / 12;
+    }
+
     .div3 {
-        grid-area: 4 / 4 / 5 / 8;
+        grid-area: 4 / 4 / 5 / 9;
         display: flex;
         justify-content: center;
 
     }
+
     .div3 > button {
         width: 20%;
     }
-    .div4 { grid-area: 2 / 1 / 3 / 6; }
-    .div5 { grid-area: 2 / 7 / 4 / 11; }
-    .div6 { grid-area: 3 / 1 / 4 / 4; }
-    .div7 { grid-area: 3 / 7 / 4 / 11; }
+
+    .div4 {
+        grid-area: 2 / 1 / 3 / 6;
+    }
+
+    .div5 {
+        grid-area: 2 / 7 / 4 / 12;
+    }
+
+    .div6 {
+        grid-area: 3 / 1 / 4 / 6;
+    }
+
+    .div7 {
+        grid-area: 3 / 7 / 4 / 12;
+    }
 
 }

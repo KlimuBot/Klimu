@@ -18,7 +18,7 @@
         <div class="suscripciones d-flex justify-content-around px-3 ">
             <th:block th:each="channel : ${channelList}">
                 <a th:href="${'/channel/' + channel.getName()}" class="text-center subscription_box parent">
-                    <button class="btn div1" th:value="${channel.getName().toUpperCase()}"></button>
+                    <button class="btn div1" th:text="${channel.getName().toUpperCase()}"></button>
                     <img th:src="@{'/media/svg/arrow.svg'}" alt="flecha" class="div2">
                 </a>
             </th:block>
