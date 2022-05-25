@@ -1,16 +1,22 @@
 package eus.klimu.users.domain.model;
 
-import lombok.*;
+import eus.klimu.notification.domain.model.UserNotification;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.Collection;
 
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@XmlRootElement
+@Entity(name = "app_user")
 public class AppUser {
 
     @Id
@@ -24,5 +30,7 @@ public class AppUser {
     private String email;
     @ManyToMany(fetch = FetchType.EAGER)
     private Collection<Role> roles = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.LAZY)
+    private Collection<UserNotification> notifications = new ArrayList<>();
 
 }

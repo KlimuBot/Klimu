@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="includes/head :: head">
+    <title id="pageTitle">Lista Alertas</title>
+</head>
+<body>
+    <!-- Custom Styling -->
+    <link rel="stylesheet" th:href="@{'/css/services/listaAlertas.css'}"/>
+
+    <!-- Main -->
+    <div class="todo">
+        <div class="left">
+            <div class="text-center">
+                <a th:href="@{'/'}" class="d-flex justify-content-center">
+                    <img th:src="@{'/media/img/klimu_title.png'}" alt="KLIMU" class="logo img-fluid">
+                </a>
+            </div>
+            <div class="suscripciones d-flex justify-content-around px-3 ">
+                <th:block th:each="channel : ${channelList}">
+                    <a th:href="${'/channel/subscription/' + channel.getName().toLowerCase()}"
+                       class="text-center subscription_box parent">
+                        <button class="btn div1" th:text="${channel.getName().toUpperCase()}"></button>
+                        <img th:src="@{'/media/svg/arrow.svg'}" alt="flecha" class="div2">
+                    </a>
+                </th:block>
+            </div>
+            <div class="py-4 unsuscribe w-100 text-center">
+                <a id="unsuscribe" href="#">UNSUBSCRIBE?</a>
+            </div>
+        </div>
+        <div class="right">
+            <div class="text-center title">
+                <button class="btn" th:text="${channelName}"></button>
+            </div>
+            <th:block th:each="notification : ${notifications}">
+                <div class="alerta">
+                    <div>
+                        <h1 th:text="${notification.getLocation().toString()}"></h1>
+                        <img th:src="@{'/media/svg/delete.svg'}" alt="eliminar">
+                    </div>
+                    <h3 th:text="${notification.getType().getName().toUpperCase()}"></h3>
+                </div>
+            </th:block>
+            <div class="text-center anadir title">
+                <a th:href="${'/' + channelName + '/add'}">
+                <button class="btn">AÑADIR</button>
+                <img th:src="@{'/media/svg/add.svg'}" alt="añadir tarea">
+                </a>
+            </div>
+        </div>
+    </div>
+    </body>
+</html>

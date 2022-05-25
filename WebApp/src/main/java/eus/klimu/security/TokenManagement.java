@@ -3,19 +3,22 @@ package eus.klimu.security;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.google.gson.Gson;
 import eus.klimu.home.api.RequestMaker;
+import eus.klimu.users.domain.model.AppUser;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.Collections;
 
 @Slf4j
 public class TokenManagement {
@@ -59,6 +62,46 @@ public class TokenManagement {
             );
             return new UsernamePasswordAuthenticationToken(json.getString("principal"), null, authorities);
         } else {
+            return null;
+        }
+    }
+
+    @Nullable
+    public AppUser getUserFromTokens(HttpSession session) {
+        RequestMaker requestMaker = new RequestMaker();
+
+        try {
+            // Try getting the user with the access token.
+            ResponseEntity<String> response = requestMaker.doGet(
+                    RequestMaker.USER_FROM_TOKEN + ((String) session.getAttribute(TokenManagement.ACCESS_TOKEN))
+                            .substring(TOKEN_SIGNATURE_NAME.length()),
+                    requestMaker.addTokenToHeader(
+                            requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
+                            (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
+                            (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
+                    ), null
+            );
+            if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
+                return gson.fromJson(response.getBody(), AppUser.class);
+            }
+            else if (response.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+
+                // Try getting the user with the refresh token.
+                response = requestMaker.doGet(
+                        RequestMaker.USER_FROM_TOKEN + ((String) session.getAttribute(TokenManagement.REFRESH_TOKEN))
+                                .substring(TOKEN_SIGNATURE_NAME.length()),
+                        requestMaker.addTokenToHeader(
+                                requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
+                                (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
+                                (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
+                        ), null
+                );
+                if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
+                    return gson.fromJson(response.getBody(), AppUser.class);
+                }
+            }
+            return null;
+        } catch (HttpClientErrorException e) {
             return null;
         }
     }

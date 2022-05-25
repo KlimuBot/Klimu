@@ -24,6 +24,7 @@ public class RequestMaker {
 
     public static final String TOKEN_URL = "https://klimu.eus/RestAPI/login";
     public static final String TOKEN_AUTH_URL = "https://klimu.eus/RestAPI/access/auth/";
+    public static final String USER_FROM_TOKEN = "https://klimu.eus/RestAPI/user/from-token/";
     public static final String REFRESH_URL = "https://klimu.eus/RestAPI/access/refresh";
 
     private final RestTemplate restTemplate = new RestTemplate();

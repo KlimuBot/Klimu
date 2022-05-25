@@ -60,13 +60,4 @@ public class HomeController {
         response.setStatus(HttpServletResponse.SC_OK);
         response.sendRedirect("/");
     }
-
-    /*
-    * De aqui para abajo es temporal, habra que mover cada cosa a su controlador.
-    * De momento se queda aqui hasta que este listo el modelo entidad relacion.
-    */
-    @GetMapping("/email")
-    public String email() {
-        return "services/email";
-    }
 }
