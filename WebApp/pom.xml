@@ -107,7 +107,7 @@
                 <configuration>
                     <update>true</update>
                     <server>maven-tomcat-war-deployment-server</server>
-                    <url>http://klimu.eus/manager/text</url>
+                    <url>https://klimu.eus/manager/text</url>
                     <path>/${project.build.finalName}</path>
                 </configuration>
             </plugin>

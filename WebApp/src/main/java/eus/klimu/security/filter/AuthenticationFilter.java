@@ -81,7 +81,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                     body.getString(TokenManagement.REFRESH_TOKEN),
                     request.getSession()
             );
-            response.sendRedirect("/subscription");
+            response.sendRedirect("/channel/subscription");
         } else {
             response.setHeader(RequestMaker.ERROR_MSG, "El usuario o contraseña no son correctos");
             response.sendRedirect("/login/sign-in");

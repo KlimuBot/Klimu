@@ -24,7 +24,7 @@ public class HomeController {
     @GetMapping("/login/sign-in")
     public String getLoginPage(
             Model model,
-            @RequestHeader(value = "errorMsg", required = false) String error
+            @RequestHeader(value = RequestMaker.ERROR_MSG, required = false) String error
     ) {
         if (error != null && error.length() > 1) {
             model.addAttribute(ERROR_MSG, error);
@@ -38,7 +38,7 @@ public class HomeController {
     @GetMapping("/login/sign-up")
     public String getSignUpPage(
             Model model,
-            @RequestParam(value = "error", required = false) String error
+            @RequestHeader(value = RequestMaker.ERROR_MSG, required = false) String error
     ) {
         if (error != null && error.length() > 1) {
             model.addAttribute(ERROR_MSG, error);
@@ -68,19 +68,5 @@ public class HomeController {
     @GetMapping("/email")
     public String email() {
         return "services/email";
-    }
-
-    @GetMapping("/subscription/alerts/{type}")
-    public String alerts(@PathVariable String type) {
-        switch (type) {
-            case "telegram": break;
-            default: break;
-        }
-        return "services/listaAlertas";
-    }
-
-    @GetMapping("/subscription")
-    public String subscription() {
-        return "services/suscripciones";
     }
 }

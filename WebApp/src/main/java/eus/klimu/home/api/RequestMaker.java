@@ -19,19 +19,24 @@ public class RequestMaker {
 
     public static final String ERROR_MSG = "errorMsg";
 
-    public static final String SERVER_LOGIN_URL = "http://klimu.eus/RestAPI/login";
-    public static final String SERVER_USER_URL = "http://klimu.eus/RestAPI/user/username/";
+    public static final String SERVER_LOGIN_URL = "https://klimu.eus/RestAPI/login";
+    public static final String SERVER_USER_URL = "https://klimu.eus/RestAPI/user/username/";
 
-    public static final String TOKEN_URL = "http://klimu.eus/RestAPI/login";
-    public static final String TOKEN_AUTH_URL = "http://klimu.eus/RestAPI/access/auth/";
-    public static final String REFRESH_URL = "http://klimu.eus/RestAPI/access/refresh";
+    public static final String TOKEN_URL = "https://klimu.eus/RestAPI/login";
+    public static final String TOKEN_AUTH_URL = "https://klimu.eus/RestAPI/access/auth/";
+    public static final String REFRESH_URL = "https://klimu.eus/RestAPI/access/refresh";
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public HttpHeaders generateHeaders(MediaType contentType, List<MediaType> acceptType) {
+    public HttpHeaders generateHeaders(@Nullable MediaType contentType, @Nullable List<MediaType> acceptType) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(contentType);
-        headers.setAccept(acceptType);
+
+        if (contentType != null) {
+            headers.setContentType(contentType);
+        }
+        if (acceptType != null) {
+            headers.setAccept(acceptType);
+        }
         return headers;
     }
 
@@ -79,6 +84,23 @@ public class RequestMaker {
      * Make a POST request to a specific URL.
      * @param url The URL of the server method.
      * @param headers The headers for the request.
+     * @param body The body for the request, can be null.
+     * @return The response from the server as a JSON object.
+     */
+    public ResponseEntity<String> doPost(String url, HttpHeaders headers, @Nullable String body) {
+        HttpEntity<String> request;
+        if (body != null) {
+            request = new HttpEntity<>(body, headers);
+        } else {
+            request = new HttpEntity<>(headers);
+        }
+        return restTemplate.exchange(url, HttpMethod.POST, request, String.class);
+    }
+
+    /**
+     * Make a POST request to a specific URL.
+     * @param url The URL of the server method.
+     * @param headers The headers for the request.
      * @param body The body for the request.
      * @return The response from the server as a JSON object.
      */
@@ -87,4 +109,37 @@ public class RequestMaker {
         return restTemplate.exchange(url, HttpMethod.POST, request, String.class);
     }
 
+    /**
+     * Make a PUT request to a specific URL.
+     * @param url The URL of the server method.
+     * @param headers The headers for the request.
+     * @param body The body for the request, can be null.
+     * @return The response from the server as a JSON object.
+     */
+    public ResponseEntity<String> doPut(String url, HttpHeaders headers, @Nullable String body) {
+        HttpEntity<String> request;
+        if (body != null) {
+            request = new HttpEntity<>(body, headers);
+        } else {
+            request = new HttpEntity<>(headers);
+        }
+        return restTemplate.exchange(url, HttpMethod.PUT, request, String.class);
+    }
+
+    /**
+     * Make a DELETE request to a specific URL.
+     * @param url The URL of the server method.
+     * @param headers The headers for the request.
+     * @param body The body for the request, can be null.
+     * @return The response from the server as a JSON object.
+     */
+    public ResponseEntity<String> doDelete(String url, HttpHeaders headers, @Nullable String body) {
+        HttpEntity<String> request;
+        if (body != null) {
+            request = new HttpEntity<>(body, headers);
+        } else {
+            request = new HttpEntity<>(headers);
+        }
+        return restTemplate.exchange(url, HttpMethod.DELETE, request, String.class);
+    }
 }
