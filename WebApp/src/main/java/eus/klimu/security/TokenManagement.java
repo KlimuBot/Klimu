@@ -73,8 +73,7 @@ public class TokenManagement {
         try {
             // Try getting the user with the access token.
             ResponseEntity<String> response = requestMaker.doGet(
-                    RequestMaker.USER_FROM_TOKEN + ((String) session.getAttribute(TokenManagement.ACCESS_TOKEN))
-                            .substring(TOKEN_SIGNATURE_NAME.length()),
+                    RequestMaker.USER_FROM_TOKEN + session.getAttribute(TokenManagement.ACCESS_TOKEN),
                     requestMaker.addTokenToHeader(
                             requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                             (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
@@ -88,8 +87,7 @@ public class TokenManagement {
 
                 // Try getting the user with the refresh token.
                 response = requestMaker.doGet(
-                        RequestMaker.USER_FROM_TOKEN + ((String) session.getAttribute(TokenManagement.REFRESH_TOKEN))
-                                .substring(TOKEN_SIGNATURE_NAME.length()),
+                        RequestMaker.USER_FROM_TOKEN + session.getAttribute(TokenManagement.REFRESH_TOKEN),
                         requestMaker.addTokenToHeader(
                                 requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                                 (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),

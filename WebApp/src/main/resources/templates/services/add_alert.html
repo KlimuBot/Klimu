@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="includes/head :: head">
-    <title id="pageTitle">Email</title>
+    <title id="pageTitle">New Notification</title>
 </head>
 
 <body>
     <!-- Custom Styling -->
-    <link rel="stylesheet" th:href="@{'/css/services/email.css'}"/>
+    <link rel="stylesheet" th:href="@{'/css/services/add_alert.css'}"/>
     <!-- JS -->
     <script type="text/javascript" th:src="@{'/js/channel.js'}"></script>
     <!-- Main -->
@@ -17,11 +17,9 @@
             </a>
         </div>
         <div class="text-center">
-            <h3 class="w-md-50 w-lg-25 w-sm-75 py-2 bck-g">E-MAIL</h3>
+            <h3 class="w-md-50 w-lg-25 w-sm-75 py-2 bck-g" th:text="${channel.toUpperCase()}"></h3>
         </div>
-
         <div class="ms-3 my-3">
-
             <div>
                 <div id="ubicacion" class="text-center mb-3">
                     <label class="title">1: AÑADIR UBICACION*</label>

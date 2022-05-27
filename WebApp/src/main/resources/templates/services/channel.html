@@ -29,20 +29,36 @@
             </div>
         </div>
         <div class="right">
-            <div class="text-center title">
-                <button class="btn" th:text="${channelName}"></button>
+            <div class="text-center title mb-3">
+                <button class="btn" th:text="${channelName.toUpperCase()}"></button>
             </div>
             <th:block th:each="notification : ${notifications}">
-                <div class="alerta">
-                    <div>
-                        <h1 th:text="${notification.getLocation().toString()}"></h1>
-                        <img th:src="@{'/media/svg/delete.svg'}" alt="eliminar">
+                <div class="card m-2">
+                    <div class="card-header row ms-0 me-0">
+                        <div class="col" th:text="${notification.getLocation().toString()}"></div>
+                        <form
+                                th:action="${'/channel/remove/' + channelName.toLowerCase() + '/' + notification.getId()}"
+                                method="post" class="col" style="text-align: right">
+                            <button type="submit" class="btn-close" aria-label="Close"></button>
+                        </form>
                     </div>
-                    <h3 th:text="${notification.getType().getName().toUpperCase()}"></h3>
+                    <div class="card-body">
+                        <span th:if="${notification.getType().getType() == 'Information'}">
+                            <i class="bi bi-info-circle"></i>
+                        </span>
+                        <span th:if="${notification.getType().getType() == 'Warning'}">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </span>
+                        <span th:if="${notification.getType().getType() == 'Dangerous'}">
+                            <i class="bi bi-exclamation-square"></i>
+                        </span>
+                        <h3 th:text="${notification.getType().getName().toUpperCase()}"></h3>
+                        <p th:text="${notification.getType().getDescription()}"></p>
+                    </div>
                 </div>
             </th:block>
             <div class="text-center anadir title">
-                <a th:href="${'/' + channelName + '/add'}">
+                <a th:href="${'/channel/' + channelName + '/add'}">
                 <button class="btn">AÑADIR</button>
                 <img th:src="@{'/media/svg/add.svg'}" alt="añadir tarea">
                 </a>
