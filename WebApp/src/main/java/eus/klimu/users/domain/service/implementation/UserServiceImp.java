@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import eus.klimu.home.api.RequestMaker;
 import eus.klimu.security.TokenManagement;
 import eus.klimu.users.domain.model.AppUser;
+import eus.klimu.users.domain.model.AppUserDTO;
 import eus.klimu.users.domain.service.definition.UserService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -178,7 +179,7 @@ public class UserServiceImp implements UserService, UserDetailsService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(user, AppUser.class)
+                ), gson.toJson(AppUserDTO.fromAppUser(user), AppUserDTO.class)
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), AppUser.class);
@@ -194,7 +195,7 @@ public class UserServiceImp implements UserService, UserDetailsService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(user, AppUser.class)
+                ), gson.toJson(AppUserDTO.fromAppUser(user), AppUserDTO.class)
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), AppUser.class);
@@ -210,7 +211,7 @@ public class UserServiceImp implements UserService, UserDetailsService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(user, AppUser.class)
+                ), gson.toJson(AppUserDTO.fromAppUser(user), AppUserDTO.class)
         );
         assert response.getStatusCode().is2xxSuccessful();
     }

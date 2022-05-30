@@ -3,9 +3,8 @@ package eus.klimu.notification.domain.service.implementation;
 import com.google.gson.Gson;
 import eus.klimu.home.api.RequestMaker;
 import eus.klimu.location.domain.model.Location;
-import eus.klimu.notification.domain.model.DatePeriod;
-import eus.klimu.notification.domain.model.Notification;
-import eus.klimu.notification.domain.model.NotificationType;
+import eus.klimu.location.domain.model.LocationDTO;
+import eus.klimu.notification.domain.model.*;
 import eus.klimu.notification.domain.service.definition.NotificationService;
 import eus.klimu.security.TokenManagement;
 import lombok.Getter;
@@ -74,7 +73,7 @@ public class NotificationServiceImp implements NotificationService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(location, Location.class)
+                ), gson.toJson(LocationDTO.fromLocation(location), LocationDTO.class)
         );
         return notificationsToList(response);
     }
@@ -88,7 +87,7 @@ public class NotificationServiceImp implements NotificationService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(type, NotificationType.class)
+                ), gson.toJson(NotificationTypeDTO.fromNotificationType(type), NotificationTypeDTO.class)
         );
         return notificationsToList(response);
     }
@@ -155,7 +154,7 @@ public class NotificationServiceImp implements NotificationService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(notification, Notification.class)
+                ), gson.toJson(NotificationDTO.fromNotification(notification), NotificationDTO.class)
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), Notification.class);
@@ -166,13 +165,17 @@ public class NotificationServiceImp implements NotificationService {
     @Override
     public List<Notification> addAllNotifications(List<Notification> notifications) {
         log.info("Saving {} new notifications", notifications.size());
+        List<NotificationDTO> notificationDTOS = new ArrayList<>();
+        notifications.forEach(notification ->
+                notificationDTOS.add(NotificationDTO.fromNotification(notification))
+        );
         ResponseEntity<String> response = requestMaker.doPost(
                 NotificationURL.CREATE.getName(),
                 requestMaker.addTokenToHeader(
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(notifications)
+                ), gson.toJson(notificationDTOS)
         );
         return notificationsToList(response);
     }
@@ -186,7 +189,7 @@ public class NotificationServiceImp implements NotificationService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(notification, Notification.class)
+                ), gson.toJson(NotificationDTO.fromNotification(notification), NotificationDTO.class)
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), Notification.class);
@@ -203,7 +206,7 @@ public class NotificationServiceImp implements NotificationService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(notification, Notification.class)
+                ), gson.toJson(NotificationDTO.fromNotification(notification), NotificationDTO.class)
         );
         assert response.getStatusCode().is2xxSuccessful();
     }

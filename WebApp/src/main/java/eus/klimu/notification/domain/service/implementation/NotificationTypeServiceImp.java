@@ -3,6 +3,7 @@ package eus.klimu.notification.domain.service.implementation;
 import com.google.gson.Gson;
 import eus.klimu.home.api.RequestMaker;
 import eus.klimu.notification.domain.model.NotificationType;
+import eus.klimu.notification.domain.model.NotificationTypeDTO;
 import eus.klimu.notification.domain.service.definition.NotificationTypeService;
 import eus.klimu.security.TokenManagement;
 import lombok.Getter;
@@ -113,7 +114,7 @@ public class NotificationTypeServiceImp implements NotificationTypeService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(notificationType, NotificationType.class)
+                ), gson.toJson(NotificationTypeDTO.fromNotificationType(notificationType), NotificationTypeDTO.class)
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), NotificationType.class);
@@ -124,13 +125,17 @@ public class NotificationTypeServiceImp implements NotificationTypeService {
     @Override
     public List<NotificationType> addAllNotificationTypes(List<NotificationType> notificationTypes) {
         log.info("Saving {} notification types on the database", notificationTypes.size());
+        List<NotificationTypeDTO> notificationTypeDTOS = new ArrayList<>();
+        notificationTypes.forEach(notificationType ->
+                notificationTypeDTOS.add(NotificationTypeDTO.fromNotificationType(notificationType))
+        );
         ResponseEntity<String> response = requestMaker.doPost(
                 NotificationTypeURL.CREATE.getName(),
                 requestMaker.addTokenToHeader(
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(notificationTypes)
+                ), gson.toJson(notificationTypeDTOS)
         );
         return notificationTypesToList(response);
     }
@@ -144,7 +149,7 @@ public class NotificationTypeServiceImp implements NotificationTypeService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(notificationType, NotificationType.class)
+                ), gson.toJson(NotificationTypeDTO.fromNotificationType(notificationType), NotificationTypeDTO.class)
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), NotificationType.class);
@@ -161,7 +166,7 @@ public class NotificationTypeServiceImp implements NotificationTypeService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(notificationType, NotificationType.class)
+                ), gson.toJson(NotificationTypeDTO.fromNotificationType(notificationType),  NotificationTypeDTO.class)
         );
         assert response.getStatusCode().is2xxSuccessful();
     }

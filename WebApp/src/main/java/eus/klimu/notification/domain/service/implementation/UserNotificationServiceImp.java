@@ -2,8 +2,10 @@ package eus.klimu.notification.domain.service.implementation;
 
 import com.google.gson.Gson;
 import eus.klimu.channel.domain.model.Channel;
+import eus.klimu.channel.domain.model.ChannelDTO;
 import eus.klimu.home.api.RequestMaker;
 import eus.klimu.notification.domain.model.LocalizedNotification;
+import eus.klimu.notification.domain.model.LocalizedNotificationDTO;
 import eus.klimu.notification.domain.model.UserNotification;
 import eus.klimu.notification.domain.model.UserNotificationDTO;
 import eus.klimu.notification.domain.service.definition.UserNotificationService;
@@ -85,7 +87,7 @@ public class UserNotificationServiceImp implements UserNotificationService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(channel, Channel.class)
+                ), gson.toJson(ChannelDTO.fromChannel(channel), ChannelDTO.class)
         );
         return userNotificationsToList(response);
     }
@@ -99,7 +101,10 @@ public class UserNotificationServiceImp implements UserNotificationService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(localizedNotification, LocalizedNotification.class)
+                ), gson.toJson(
+                        LocalizedNotificationDTO.fromLocalizedNotification(localizedNotification),
+                        LocalizedNotificationDTO.class
+                )
         );
         return userNotificationsToList(response);
     }
@@ -113,7 +118,10 @@ public class UserNotificationServiceImp implements UserNotificationService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(userNotification, UserNotification.class)
+                ), gson.toJson(
+                        UserNotificationDTO.fromUserNotification(userNotification),
+                        UserNotificationDTO.class
+                )
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), UserNotification.class);
@@ -124,13 +132,17 @@ public class UserNotificationServiceImp implements UserNotificationService {
     @Override
     public List<UserNotification> addAllUserNotifications(List<UserNotification> userNotifications) {
         log.info("Saving {} user notifications on the database", userNotifications.size());
+        List<UserNotificationDTO> userNotificationDTOS = new ArrayList<>();
+        userNotifications.forEach(userNotification ->
+                userNotificationDTOS.add(UserNotificationDTO.fromUserNotification(userNotification))
+        );
         ResponseEntity<String> response = requestMaker.doPost(
                 UserNotificationURL.CREATE.getName(),
                 requestMaker.addTokenToHeader(
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(userNotifications)
+                ), gson.toJson(userNotificationDTOS)
         );
         return userNotificationsToList(response);
     }
@@ -168,7 +180,7 @@ public class UserNotificationServiceImp implements UserNotificationService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(userNotification, UserNotification.class)
+                ), gson.toJson(UserNotificationDTO.fromUserNotification(userNotification), UserNotificationDTO.class)
         );
         assert response.getStatusCode().is2xxSuccessful();
     }

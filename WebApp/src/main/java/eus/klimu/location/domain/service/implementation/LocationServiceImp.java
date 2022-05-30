@@ -3,6 +3,7 @@ package eus.klimu.location.domain.service.implementation;
 import com.google.gson.Gson;
 import eus.klimu.home.api.RequestMaker;
 import eus.klimu.location.domain.model.Location;
+import eus.klimu.location.domain.model.LocationDTO;
 import eus.klimu.location.domain.service.definition.LocationService;
 import eus.klimu.security.TokenManagement;
 import lombok.Getter;
@@ -134,7 +135,7 @@ public class LocationServiceImp implements LocationService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(location, Location.class)
+                ), gson.toJson(LocationDTO.fromLocation(location), LocationDTO.class)
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), Location.class);
@@ -145,13 +146,17 @@ public class LocationServiceImp implements LocationService {
     @Override
     public List<Location> addAllLocations(List<Location> locations) {
         log.info("Saving {} location(s)", locations.size());
+        List<LocationDTO> locationDTOS = new ArrayList<>();
+        locations.forEach(location ->
+                locationDTOS.add(LocationDTO.fromLocation(location))
+        );
         ResponseEntity<String> response = requestMaker.doPost(
                 LocationURL.CREATE_ALL.getName(),
                 requestMaker.addTokenToHeader(
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(locations)
+                ), gson.toJson(locationDTOS)
         );
         return locationsToList(response);
     }
@@ -165,7 +170,7 @@ public class LocationServiceImp implements LocationService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(location, Location.class)
+                ), gson.toJson(LocationDTO.fromLocation(location), LocationDTO.class)
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), Location.class);
@@ -182,7 +187,7 @@ public class LocationServiceImp implements LocationService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(location, Location.class)
+                ), gson.toJson(LocationDTO.fromLocation(location), LocationDTO.class)
         );
         assert response.getStatusCode().is2xxSuccessful();
     }

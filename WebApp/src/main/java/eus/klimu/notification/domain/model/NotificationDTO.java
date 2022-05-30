@@ -12,10 +12,22 @@ import java.util.Date;
 @NoArgsConstructor
 public class NotificationDTO implements Serializable {
 
-    private long id;
+    private Long id;
     private String message;
     private Date date;
-    private long notificationTypeId;
-    private long locationId;
+    private Long notificationTypeId;
+    private Long locationId;
+
+    public static NotificationDTO fromNotification(Notification notification) {
+        NotificationDTO notificationDTO = new NotificationDTO();
+
+        notificationDTO.setId(notification.getId());
+        notificationDTO.setMessage(notification.getMessage());
+        notificationDTO.setDate(notification.getDate());
+        notificationDTO.setNotificationTypeId(notification.getType().getId());
+        notificationDTO.setLocationId(notification.getLocation().getId());
+
+        return notificationDTO;
+    }
 
 }

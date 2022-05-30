@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import eus.klimu.home.api.RequestMaker;
 import eus.klimu.security.TokenManagement;
 import eus.klimu.users.domain.model.Role;
+import eus.klimu.users.domain.model.RoleDTO;
 import eus.klimu.users.domain.service.definition.RoleService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -101,7 +102,7 @@ public class RoleServiceImp implements RoleService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(role, Role.class)
+                ), gson.toJson(RoleDTO.fromRole(role), RoleDTO.class)
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), Role.class);
@@ -112,13 +113,15 @@ public class RoleServiceImp implements RoleService {
     @Override
     public List<Role> saveAllRoles(List<Role> roles) {
         log.info("Saving {} roles on the database", roles.size());
+        List<RoleDTO> roleDTOS = new ArrayList<>();
+        roles.forEach(role -> roleDTOS.add(RoleDTO.fromRole(role)));
         ResponseEntity<String> response = requestMaker.doPost(
                 RoleURL.CREATE.getName(),
                 requestMaker.addTokenToHeader(
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(roles)
+                ), gson.toJson(roleDTOS)
         );
         return rolesToList(response);
     }
@@ -132,7 +135,7 @@ public class RoleServiceImp implements RoleService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(role, Role.class)
+                ), gson.toJson(RoleDTO.fromRole(role), RoleDTO.class)
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), Role.class);
@@ -149,7 +152,7 @@ public class RoleServiceImp implements RoleService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(role, Role.class)
+                ), gson.toJson(RoleDTO.fromRole(role), RoleDTO.class)
         );
         assert response.getStatusCode().is2xxSuccessful();
     }

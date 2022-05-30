@@ -2,6 +2,7 @@ package eus.klimu.channel.domain.service.implementation;
 
 import com.google.gson.Gson;
 import eus.klimu.channel.domain.model.Channel;
+import eus.klimu.channel.domain.model.ChannelDTO;
 import eus.klimu.channel.domain.service.definition.ChannelService;
 import eus.klimu.home.api.RequestMaker;
 import eus.klimu.security.TokenManagement;
@@ -93,7 +94,7 @@ public class ChannelServiceImp implements ChannelService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(channel, Channel.class)
+                ), gson.toJson(ChannelDTO.fromChannel(channel), ChannelDTO.class)
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), Channel.class);
@@ -103,13 +104,17 @@ public class ChannelServiceImp implements ChannelService {
 
     @Override
     public List<Channel> addAllChannels(List<Channel> channels) {
+        List<ChannelDTO> channelDTOS = new ArrayList<>();
+        channels.forEach(channel ->
+                channelDTOS.add(ChannelDTO.fromChannel(channel))
+        );
         ResponseEntity<String> response = requestMaker.doPost(
                 ChannelURL.CREATE_ALL.getName(),
                 requestMaker.addTokenToHeader(
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(channels)
+                ), gson.toJson(channelDTOS)
         );
         return channelsToList(response);
     }
@@ -122,7 +127,7 @@ public class ChannelServiceImp implements ChannelService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(channel, Channel.class)
+                ), gson.toJson(ChannelDTO.fromChannel(channel), ChannelDTO.class)
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), Channel.class);
@@ -138,7 +143,7 @@ public class ChannelServiceImp implements ChannelService {
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(channel, Channel.class)
+                ), gson.toJson(ChannelDTO.fromChannel(channel), ChannelDTO.class)
         );
         assert response.getStatusCode().is2xxSuccessful();
     }

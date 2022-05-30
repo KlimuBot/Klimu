@@ -146,7 +146,8 @@ public class LocalizedNotificationServiceImp implements LocalizedNotificationSer
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
                 ), gson.toJson(
                         LocalizedNotificationDTO.fromLocalizedNotification(localizedNotification),
-                        LocalizedNotificationDTO.class)
+                        LocalizedNotificationDTO.class
+                )
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), LocalizedNotification.class);
@@ -182,7 +183,8 @@ public class LocalizedNotificationServiceImp implements LocalizedNotificationSer
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
                 ), gson.toJson(
                         LocalizedNotificationDTO.fromLocalizedNotification(localizedNotification),
-                        LocalizedNotificationDTO.class)
+                        LocalizedNotificationDTO.class
+                )
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), LocalizedNotification.class);
@@ -201,7 +203,8 @@ public class LocalizedNotificationServiceImp implements LocalizedNotificationSer
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
                 ), gson.toJson(
                         LocalizedNotificationDTO.fromLocalizedNotification(localizedNotification),
-                        LocalizedNotificationDTO.class)
+                        LocalizedNotificationDTO.class
+                )
         );
         assert response.getStatusCode().is2xxSuccessful();
     }
