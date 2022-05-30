@@ -2,8 +2,11 @@ package eus.klimu.channel.api;
 
 import eus.klimu.channel.domain.model.Channel;
 import eus.klimu.channel.domain.service.definition.ChannelService;
+import eus.klimu.location.domain.model.Location;
 import eus.klimu.location.domain.service.definition.LocationService;
+import eus.klimu.notification.domain.model.NotificationType;
 import eus.klimu.notification.domain.service.definition.LocalizedNotificationService;
+import eus.klimu.notification.domain.service.definition.NotificationTypeService;
 import eus.klimu.notification.domain.service.definition.UserNotificationService;
 import eus.klimu.notification.domain.model.LocalizedNotification;
 import eus.klimu.security.TokenManagement;
@@ -22,7 +25,9 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -32,6 +37,7 @@ public class ChannelController {
 
     private final ChannelService channelService;
     private final LocationService locationService;
+    private final NotificationTypeService notificationTypeService;
     private final UserNotificationService userNotificationService;
     private final LocalizedNotificationService localizedNotificationService;
 
@@ -78,8 +84,15 @@ public class ChannelController {
     public String getNotificationAddingPage(@PathVariable String channel, Model model) {
         log.info("Fetching the alert configuration modification page for {}", channel);
 
+        List<Location> locationList = locationService.getAllLocations();
+        List<NotificationType> notificationList = notificationTypeService.getAllNotificationTypes();
+
+        Collections.sort(locationList);
+        Collections.sort(notificationList);
+
         model.addAttribute("channel", channel);
-        model.addAttribute("location", locationService.getAllLocations());
+        model.addAttribute("locationList", locationList);
+        model.addAttribute("notificationList", notificationList);
 
         return "services/add_alert";
     }

@@ -12,7 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "notification_type")
-public class NotificationType {
+public class NotificationType implements Comparable<NotificationType> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -21,4 +21,9 @@ public class NotificationType {
     private String name;
     private String description;
     private String type; // info, warning, danger, etc.
+
+    @Override
+    public int compareTo(NotificationType n) {
+        return this.name.toLowerCase().compareTo(n.getName().toLowerCase());
+    }
 }

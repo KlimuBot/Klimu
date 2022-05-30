@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @AllArgsConstructor
 @XmlRootElement
 @Entity(name = "location")
-public class Location {
+public class Location implements Comparable<Location> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -28,5 +28,10 @@ public class Location {
     @Override
     public String toString() {
         return city + ", " + country;
+    }
+
+    @Override
+    public int compareTo(Location l) {
+        return this.toString().toLowerCase().compareTo(l.toString().toLowerCase());
     }
 }

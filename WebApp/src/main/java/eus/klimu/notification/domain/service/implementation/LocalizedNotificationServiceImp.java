@@ -3,6 +3,9 @@ package eus.klimu.notification.domain.service.implementation;
 import com.google.gson.Gson;
 import eus.klimu.home.api.RequestMaker;
 import eus.klimu.location.domain.model.Location;
+import eus.klimu.location.domain.model.LocationDTO;
+import eus.klimu.notification.domain.model.LocalizedNotificationDTO;
+import eus.klimu.notification.domain.model.NotificationTypeDTO;
 import eus.klimu.notification.domain.service.definition.LocalizedNotificationService;
 import eus.klimu.notification.domain.model.LocalizedNotification;
 import eus.klimu.notification.domain.model.NotificationType;
@@ -110,7 +113,7 @@ public class LocalizedNotificationServiceImp implements LocalizedNotificationSer
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(location, Location.class)
+                ), gson.toJson(LocationDTO.fromLocation(location), LocationDTO.class)
         );
         return localizedNotificationToList(response);
     }
@@ -124,7 +127,7 @@ public class LocalizedNotificationServiceImp implements LocalizedNotificationSer
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(notificationType, Location.class)
+                ), gson.toJson(NotificationTypeDTO.fromNotificationType(notificationType), NotificationTypeDTO.class)
         );
         return localizedNotificationToList(response);
     }
@@ -135,10 +138,15 @@ public class LocalizedNotificationServiceImp implements LocalizedNotificationSer
         ResponseEntity<String> response = requestMaker.doPost(
                 LocalizedNotificationURL.CREATE.getName(),
                 requestMaker.addTokenToHeader(
-                        requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
+                        requestMaker.generateHeaders(
+                                MediaType.APPLICATION_JSON,
+                                Collections.singletonList(MediaType.APPLICATION_JSON)
+                        ),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(localizedNotification, LocalizedNotification.class)
+                ), gson.toJson(
+                        LocalizedNotificationDTO.fromLocalizedNotification(localizedNotification),
+                        LocalizedNotificationDTO.class)
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), LocalizedNotification.class);
@@ -149,13 +157,16 @@ public class LocalizedNotificationServiceImp implements LocalizedNotificationSer
     @Override
     public List<LocalizedNotification> addAllLocalizedNotifications(List<LocalizedNotification> localizedNotifications) {
         log.info("Saving {} localized notifications on the database", localizedNotifications.size());
+        List<LocalizedNotificationDTO> localizedNotificationDTOS = new ArrayList<>();
+        localizedNotifications.forEach(localizedNotification ->
+                localizedNotificationDTOS.add(LocalizedNotificationDTO.fromLocalizedNotification(localizedNotification)));
         ResponseEntity<String> response = requestMaker.doPost(
                 LocalizedNotificationURL.CREATE.getName(),
                 requestMaker.addTokenToHeader(
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(localizedNotifications)
+                ), gson.toJson(localizedNotificationDTOS)
         );
         return localizedNotificationToList(response);
     }
@@ -169,7 +180,9 @@ public class LocalizedNotificationServiceImp implements LocalizedNotificationSer
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(localizedNotification, LocalizedNotification.class)
+                ), gson.toJson(
+                        LocalizedNotificationDTO.fromLocalizedNotification(localizedNotification),
+                        LocalizedNotificationDTO.class)
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), LocalizedNotification.class);
@@ -186,7 +199,9 @@ public class LocalizedNotificationServiceImp implements LocalizedNotificationSer
                         requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
                         (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
                         (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(localizedNotification, LocalizedNotification.class)
+                ), gson.toJson(
+                        LocalizedNotificationDTO.fromLocalizedNotification(localizedNotification),
+                        LocalizedNotificationDTO.class)
         );
         assert response.getStatusCode().is2xxSuccessful();
     }

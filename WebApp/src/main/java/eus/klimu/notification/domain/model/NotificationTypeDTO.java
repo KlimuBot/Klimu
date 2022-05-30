@@ -16,4 +16,15 @@ public class NotificationTypeDTO implements Serializable {
     private String description;
     private String type;
 
+    public static NotificationTypeDTO fromNotificationType(NotificationType notificationType) {
+        NotificationTypeDTO notificationTypeDTO = new NotificationTypeDTO();
+
+        notificationTypeDTO.setId(notificationType.getId());
+        notificationTypeDTO.setName(notificationType.getName());
+        notificationTypeDTO.setDescription(notificationType.getDescription());
+        notificationTypeDTO.setType(notificationType.getType());
+
+        return notificationTypeDTO;
+    }
+
 }
