@@ -21,6 +21,7 @@ public class AppUserDTO implements Serializable {
     private String surname;
     private String email;
     private String number;
+    private String telegramId;
     private Collection<Long> roles;
     private Collection<Long> notifications;
 
@@ -34,6 +35,7 @@ public class AppUserDTO implements Serializable {
         appUserDTO.setSurname(appUser.getSurname());
         appUserDTO.setEmail(appUser.getEmail());
         appUserDTO.setNumber(appUser.getNumber());
+        appUserDTO.setTelegramId(appUser.getTelegramId());
 
         List<Long> roles = new ArrayList<>();
         appUser.getRoles().forEach(role -> roles.add(role.getId()));

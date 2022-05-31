@@ -29,6 +29,7 @@ public class AppUser {
     private String surname;
     private String email;
     private String number;
+    private String telegramId;
     @ManyToMany(fetch = FetchType.EAGER)
     private Collection<Role> roles = new ArrayList<>();
     @ManyToMany(fetch = FetchType.LAZY)
