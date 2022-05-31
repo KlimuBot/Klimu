@@ -60,7 +60,7 @@ public class UserController {
                     userNotifications.add(userNotification);
                 });
                 AppUser user = userService.saveUser(new AppUser(
-                        null, username, password, name, surname, email, number,
+                        null, username, password, name, surname, email, number, null,
                         Collections.singletonList(roleService.getRole("USER_ROLE")),
                         userNotifications
                 ));
