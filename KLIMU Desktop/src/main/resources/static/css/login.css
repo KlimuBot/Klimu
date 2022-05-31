@@ -1,0 +1,128 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    height: 100%;
+    width: 100%;
+}
+
+.login {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.logo {
+    height: 50%;
+}
+
+.logo img {
+    max-height: 100%;
+    width: 100%;
+}
+
+.login .title {
+    font-weight: 600;
+    font-size: 1.4rem;
+    padding-left: 10px;
+    color: red;
+    font-weight: bold;
+}
+
+.login .dato_usuario input {
+    width: 100%;
+    /*display: block;*/
+    /*outline: none;*/
+    border: none;
+    background: none;
+    font-size: 1.2rem;
+    color: #666;
+    padding: 10px;
+}
+
+
+/*para dar buen aspecto al input*/
+
+.login .dato_usuario {
+    padding-left: 10px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    background-color: #EBEEE2;
+}
+
+.login .btn {
+    box-shadow: none;
+    width: 100%;
+    font-weight: 600;
+    background-color: #4BCC78;
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 3px 3px 3px #b1b1b1, -3px -3px 3px #fff;
+
+}
+#username{
+    outline: none;
+}
+#password{
+    outline: none;
+}
+
+.login .btn a {
+    text-decoration: none;
+    font-size: 1.2rem;
+    color: white;
+    letter-spacing: 1.3px
+}
+
+.login a {
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 720;
+    color: #727171;
+}
+
+#fill_image {
+    display: none;
+}
+
+#img_dos {
+    display: none;
+}
+
+
+/*medias*/
+
+@media (min-width: 600px) {
+    #fill_image {
+        display: block;
+
+    }
+    #fill_image>img {
+        height: 98vh;
+        width: 100%;
+        object-fit: cover;
+    }
+    #img_uno {
+        display: none;
+    }
+    #img_dos {
+        width: 80%;
+        display: block;
+
+    }
+}
+
+@media (min-width: 1200px) {
+
+}
+
+@media (min-width: 1600px) {
+
+}

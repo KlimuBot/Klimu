@@ -14,39 +14,50 @@
         <img  th:src="@{'/media/img/klimu_title.png'}" alt="KLIMU Logo" class="logo_title">
     </a>
     <h2>Sign-up</h2>
-    <div class="parent">
+    <form class="parent" method="post" th:action="@{/user/create}">
         <div class="div1 conjunto">
-            <h3>NOMBRE</h3>
-            <input type="text" class="input_texto">
+            <label>
+                <div class="h3">NOMBRE</div>
+                <input type="text" class="input_texto" name="name">
+            </label>
         </div>
         <div class="div2 conjunto">
-            <h3>APELLIDO</h3>
-            <input type="text" class="input_texto">
+            <label>
+                <div class="h3">APELLIDO</div>
+                <input type="text" class="input_texto" name="surname">
+            </label>
         </div>
         <div class="div4 conjunto">
-            <h3>EMAIL</h3>
-            <input type="email" class="input_texto">
+            <label>
+                <div class="h3">EMAIL</div>
+                <input type="email" class="input_texto" name="email">
+            </label>
         </div>
         <div class="div5 conjunto">
-            <h3>TELEFONO</h3>
-            <input type="tel" class="input_texto">
+            <label>
+                <div class="h3">TELEFONO</div>
+                <input type="tel" class="input_texto" name="number">
+            </label>
         </div>
         <div class="div6 conjunto">
-            <h3>USERNAME</h3>
-            <input type="text" class="input_texto">
+            <label>
+                <div class="h3">USERNAME</div>
+                <input type="text" class="input_texto" name="username">
+            </label>
         </div>
         <div class="div7 conjunto">
-            <h3>CONTRASEÑA</h3>
-            <input type="password" class="input_texto">
+            <label>
+                <div class="h3">CONTRASEÑA</div>
+                <input type="password" class="input_texto" name="password">
+            </label>
         </div>
-
         <div class="div3">
-            <a th:href="@{/channel/subscription}" class="text-center subscription_box m-1 p-1">
-                <button class="btn btn-subscribe">SUBSCRIBE NOW</button>
+            <div class="text-center subscription_box m-1 p-1">
+                <button type="submit" class="btn btn-subscribe">SUBSCRIBE NOW</button>
                 <img th:src="@{'/media/svg/arrow.svg'}" alt="flecha" class="div2">
-            </a>
+            </div>
         </div>
-    </div>
+    </form>
 </div>
 </body>
 </html>

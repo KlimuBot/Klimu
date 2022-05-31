@@ -114,11 +114,8 @@ public class UserNotificationServiceImp implements UserNotificationService {
         log.info("Saving a user notification on the database");
         ResponseEntity<String> response = requestMaker.doPost(
                 UserNotificationURL.CREATE.getName(),
-                requestMaker.addTokenToHeader(
-                        requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
-                        (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
-                        (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(
+                requestMaker.generateHeaders(MediaType.APPLICATION_JSON, Collections.singletonList(MediaType.APPLICATION_JSON)),
+                gson.toJson(
                         UserNotificationDTO.fromUserNotification(userNotification),
                         UserNotificationDTO.class
                 )

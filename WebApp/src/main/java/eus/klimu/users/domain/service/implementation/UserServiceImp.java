@@ -175,11 +175,8 @@ public class UserServiceImp implements UserService, UserDetailsService {
         // Save the user.
         ResponseEntity<String> response = requestMaker.doPost(
                 UserURL.CREATE.getName(),
-                requestMaker.addTokenToHeader(
-                        requestMaker.generateHeaders(null, Collections.singletonList(MediaType.APPLICATION_JSON)),
-                        (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
-                        (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
-                ), gson.toJson(AppUserDTO.fromAppUser(user), AppUserDTO.class)
+                requestMaker.generateHeaders(MediaType.APPLICATION_JSON, Collections.singletonList(MediaType.APPLICATION_JSON)),
+                gson.toJson(AppUserDTO.fromAppUser(user), AppUserDTO.class)
         );
         if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             return gson.fromJson(response.getBody(), AppUser.class);

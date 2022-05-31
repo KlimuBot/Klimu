@@ -33,9 +33,12 @@ body {
 
 .input_texto {
     height: 2.4rem;
+    width: 100%;
+
     background-color: #EBEEE2;
     border-color: #EBEEE2;
     border-style: none;
+    font-family: 'Arial', serif;
 
     outline: none;
     padding: 0.3rem;
