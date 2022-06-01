@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="includes/head :: head">
+    <title id="pageTitle">KLIMU App</title>
+</head>
+<body>
+    <!-- Custom Styling -->
+    <link rel="stylesheet" th:href="@{'/css/services/listaAlertas.css'}"/>
+
+    <!-- Main -->
+    <div class="todo vh-100">
+        <div class="left">
+            <div class="text-center">
+                <a th:href="@{'https://klimu.eus'}" class="d-flex justify-content-center">
+                    <img th:src="@{'/media/img/klimu_title.png'}" alt="KLIMU" class="logo img-fluid">
+                </a>
+            </div>
+            <div class="suscripciones d-flex justify-content-around px-3 ">
+
+            </div>
+            <div class="py-4 unsuscribe w-100 text-center">
+                <a id="unsuscribe" href="/logout">EXIT?</a>
+            </div>
+        </div>
+        <div class="right">
+            <div th:if="${notifications.size() > 0}" class="alerts-div overflow-auto h-75">
+                <th:block th:each="notification : ${notifications}">
+                    <div class="card m-2">
+                        <div class="card-header row ms-0 me-0">
+                            <div class="col" th:text="${notification.getLocation().toString()}"></div>
+                            <form
+                                    th:action="${'/channel/remove/' + channelName.toLowerCase() + '/' + notification.getId()}"
+                                    method="post" class="col" style="text-align: right">
+                                <button type="submit" class="btn-close" aria-label="Close"></button>
+                            </form>
+                        </div>
+                        <div class="card-body">
+                        <span class="m-3" th:if="${notification.getType().getType() == 'Information'}">
+                            <i class="bi bi-info-circle"></i>
+                        </span>
+                            <span class="m-3" th:if="${notification.getType().getType() == 'Warning'}">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </span>
+                            <span class="m-3" th:if="${notification.getType().getType() == 'Dangerous'}">
+                            <i class="bi bi-exclamation-square"></i>
+                        </span>
+                            <h3 th:text="${notification.getType().getName().toUpperCase()}"></h3>
+                            <p th:text="${notification.getType().getDescription()}"></p>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+    </div>
+    </body>
+</html>

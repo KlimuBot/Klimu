@@ -51,14 +51,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // ACL list.
         http.authorizeRequests()
                 .antMatchers("/js/**", "/css/**", "/media/**").permitAll()
-                .antMatchers("/user/create", "/login/sign-up").permitAll()
-                .antMatchers("/").permitAll()
             .and().authorizeRequests()
                 .anyRequest().authenticated()
             .and()
-                .formLogin().loginPage("/").loginProcessingUrl("/login").permitAll()
+                .formLogin().loginPage("/klimu/login").loginProcessingUrl("/login").permitAll()
             .and()
-                .logout().logoutUrl("/logout").logoutSuccessUrl("/");
+                .logout().logoutUrl("/logout").logoutSuccessUrl("/klimu/login");
 
         // Add filters.
         http.addFilter(authenticationFilter);

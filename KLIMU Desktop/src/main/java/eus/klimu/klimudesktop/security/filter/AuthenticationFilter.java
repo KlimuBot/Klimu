@@ -79,10 +79,10 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                     body.getString(TokenManagement.REFRESH_TOKEN),
                     request.getSession()
             );
-            response.sendRedirect("/channel/subscription");
+            response.sendRedirect("/klimu/app");
         } else {
             response.setHeader(RequestMaker.ERROR_MSG, "El usuario o contraseña no son correctos");
-            response.sendRedirect("/login/sign-in");
+            response.sendRedirect("/klimu/login");
         }
     }
 
@@ -93,6 +93,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         session.removeAttribute(RequestMaker.PASSWORD_HEADER);
 
         response.setHeader(RequestMaker.ERROR_MSG, "El usuario o contraseña no son correctos");
-        response.sendRedirect("/login/sign-in");
+        response.sendRedirect("/klimu/login");
     }
 }

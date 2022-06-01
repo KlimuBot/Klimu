@@ -10,6 +10,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Map;
 
 @NoArgsConstructor
 public class RequestMaker {
@@ -69,16 +70,6 @@ public class RequestMaker {
             request = new HttpEntity<>(headers);
         }
         return restTemplate.exchange(url, HttpMethod.GET, request, String.class);
-    }
-
-    /**
-     * Make a GET request to a specific URL with a JSON.
-     * @param url The URL of the server method.
-     * @param json A json object for the request.
-     * @return A response with a JSON object.
-     */
-    public ResponseEntity<JSONObject> doGetJSON(String url, String json) {
-        return restTemplate.getForEntity(url, JSONObject.class, json);
     }
 
     /**

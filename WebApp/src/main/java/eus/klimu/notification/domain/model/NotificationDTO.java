@@ -4,11 +4,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Date;
 
 @Getter
 @Setter
+@XmlRootElement
 @NoArgsConstructor
 public class NotificationDTO implements Serializable {
 

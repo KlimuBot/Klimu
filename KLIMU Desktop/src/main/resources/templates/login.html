@@ -12,13 +12,13 @@
         <div class="row">
             <div class="login col">
                 <div class="logo">
-                    <a th:href="@{'/'}" class=" d-flex justify-content-center">
+                    <a th:href="@{'https://klimu.eus'}" class=" d-flex justify-content-center" target="_blank">
                     <img id="img_uno" th:src="@{'/media/img/logo1.png'}" alt="Logo de KLIMU" class="img-fluid">
                     <img id="img_dos" th:src="@{'/media/img/klimu_title.png'}" alt="KLIMU" >
                     </a>
                 </div>
 
-                <div class="mt-4 title"> Log in</div>
+                <div class="mt-4 title">Log in</div>
                 <form class="p-3 mt-3" method="post" action="/login">
                     <div class="dato_usuario d-flex align-items-center"><span class="fas fa-user"></span>
                         <input id="username" name="username" type="text" placeholder="Usuario">
@@ -29,7 +29,7 @@
                     <button class="btn mt-3" type="submit">Login</button>
                 </form>
                 <div class="text-center">
-                    <a href="https://klimu.eus/login/sign-up">Don't have an account?<br>Sign up</a>
+                    <a href="http://localhost:8080/klimu/app">Already logged in?<br>Enter</a>
                 </div>
             </div>
             <div id="fill_image" class="col">

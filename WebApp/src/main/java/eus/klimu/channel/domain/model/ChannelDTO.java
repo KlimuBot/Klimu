@@ -5,10 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
 @Getter
 @Setter
+@XmlRootElement
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChannelDTO implements Serializable {

@@ -18,7 +18,7 @@ import java.net.URISyntaxException;
 @SpringBootApplication
 public class KlimuDesktopApplication {
 
-    private static final String URL = "http://localhost:8080/login";
+    private static final String URL = "http://localhost:8080/klimu/login";
 
     public static void main(String[] args) {
         SpringApplication.run(KlimuDesktopApplication.class, args);

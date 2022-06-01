@@ -16,9 +16,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.client.HttpClientErrorException;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 @Slf4j
 public class TokenManagement {
@@ -35,13 +33,13 @@ public class TokenManagement {
         log.info("The user has been authenticated, their tokens have been generated");
     }
 
-    public JSONObject getTokensAsJSON(String accessToken, String refreshToken) {
-        JSONObject json = new JSONObject();
+    public String getTokensAsJSON(String accessToken, String refreshToken) {
+        Map<String, String> map = new HashMap<>();
 
-        json.append(TokenManagement.ACCESS_TOKEN, accessToken);
-        json.append(TokenManagement.REFRESH_TOKEN, refreshToken);
+        map.put(TokenManagement.ACCESS_TOKEN, accessToken);
+        map.put(TokenManagement.REFRESH_TOKEN, refreshToken);
 
-        return json;
+        return new JSONObject(map).toString();
     }
 
     public UsernamePasswordAuthenticationToken getUsernamePasswordToken(HttpSession session, String authToken)
@@ -53,7 +51,7 @@ public class TokenManagement {
         ResponseEntity<String> response = new RequestMaker().doGet(
                 RequestMaker.TOKEN_AUTH_URL + authToken, headers, null
         );
-        if (response.hasBody()) {
+        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             JSONObject json = new JSONObject(response.getBody());
             Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
@@ -61,9 +59,8 @@ public class TokenManagement {
                 authorities.add(new SimpleGrantedAuthority(((JSONObject) role).getString("role")))
             );
             return new UsernamePasswordAuthenticationToken(json.getString("principal"), null, authorities);
-        } else {
-            return null;
         }
+        throw new JWTVerificationException("Not found");
     }
 
     @Nullable

@@ -1,13 +1,12 @@
-package eus.klimu.notification.domain.model;
+package eus.klimu.klimudesktop.app.notification;
 
-import eus.klimu.channel.domain.model.Channel;
+import eus.klimu.klimudesktop.app.channel.Channel;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -16,16 +15,10 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 @XmlRootElement
-@Entity(name = "user_notification")
 public class UserNotification {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "channel_id")
     private Channel channel;
-    @ManyToMany
     private Collection<LocalizedNotification> notifications = new ArrayList<>();
 
 }
