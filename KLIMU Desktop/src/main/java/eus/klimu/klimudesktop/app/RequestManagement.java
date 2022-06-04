@@ -1,11 +1,14 @@
 package eus.klimu.klimudesktop.app;
 
 import com.google.gson.Gson;
+import eus.klimu.klimudesktop.app.notification.LocalizedNotification;
+import eus.klimu.klimudesktop.app.notification.Notification;
 import eus.klimu.klimudesktop.app.user.AppUser;
 import eus.klimu.klimudesktop.connection.RequestMaker;
 import eus.klimu.klimudesktop.security.TokenManagement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -20,13 +23,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserDetailsServiceImp implements UserDetailsService {
+public class RequestManagement implements UserDetailsService {
 
     private final Gson gson = new Gson();
     private final HttpSession session;
@@ -53,7 +56,7 @@ public class UserDetailsServiceImp implements UserDetailsService {
                         new HttpHeaders(),
                         tokens.getString(TokenManagement.ACCESS_TOKEN),
                         tokens.getString(TokenManagement.REFRESH_TOKEN)
-                ), null
+                )
         );
         // Check if the user was found.
         if (appUserResponse.getStatusCode().is2xxSuccessful() && appUserResponse.hasBody()) {
@@ -110,4 +113,48 @@ public class UserDetailsServiceImp implements UserDetailsService {
         throw new UsernameNotFoundException("User with username" + username + "couldn't be found");
     }
 
+    public List<Notification> getUserNotifications(AppUser user) {
+        List<LocalizedNotification> localizedNotifications = new ArrayList<>();
+        List<Notification> userNotifications = new ArrayList<>();
+
+        if (user != null) {
+            user.getNotifications().forEach(userNotification -> {
+                if (userNotification.getChannel().getName().equalsIgnoreCase("desktop")) {
+                    localizedNotifications.addAll(userNotification.getNotifications());
+                }
+            });
+            List<Notification> notifications = getNotifications();
+
+            for (LocalizedNotification ln : localizedNotifications) {
+                for (Notification n : notifications) {
+                    if (ln.getLocation().equals(n.getLocation()) && ln.getType().equals(n.getType())) {
+                        userNotifications.add(n);
+                    }
+                }
+            }
+        }
+        return userNotifications;
+    }
+
+    private List<Notification> getNotifications() {
+        ResponseEntity<String> response = requestMaker.doGet(
+                "https://klimu.eus/RestAPI/notification/all/limited",
+                requestMaker.addTokenToHeader(
+                        requestMaker.generateHeaders(
+                                MediaType.APPLICATION_JSON,
+                                Collections.singletonList(MediaType.APPLICATION_JSON)
+                        ),
+                        (String) session.getAttribute(TokenManagement.ACCESS_TOKEN),
+                        (String) session.getAttribute(TokenManagement.REFRESH_TOKEN)
+                )
+        );
+        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
+            JSONArray json = new JSONArray(response.getBody());
+            List<Notification> notifications = new ArrayList<>();
+
+            json.forEach(obj -> notifications.add(gson.fromJson(obj.toString(), Notification.class)));
+            return notifications;
+        }
+        return new ArrayList<>();
+    }
 }

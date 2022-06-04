@@ -47,14 +47,18 @@ public class AuthorizationFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authToken);
 
                         // Generate a new access and refresh token for the user.
-                        String json = tokenManagement.getTokensAsJSON(accessToken, refreshToken).toString();
-                        ResponseEntity<JSONObject> refreshResponse = new RequestMaker().doGetJSON(RequestMaker.REFRESH_URL, json);
+                        ResponseEntity<String> refreshResponse = new RequestMaker().doGet(
+                                RequestMaker.REFRESH_URL, new RequestMaker().addTokenToHeader(
+                                        new RequestMaker().generateHeaders(null, null),
+                                        accessToken, refreshToken
+                                )
+                        );
 
                         if (refreshResponse.getStatusCode().is2xxSuccessful() && refreshResponse.hasBody()) {
-                            JSONObject tokens = refreshResponse.getBody();
+                            JSONObject tokens = new JSONObject(refreshResponse.getBody());
 
                             if (
-                                tokens != null && tokens.has(TokenManagement.ACCESS_TOKEN) &&
+                                tokens.has(TokenManagement.ACCESS_TOKEN) &&
                                 tokens.has(TokenManagement.REFRESH_TOKEN)
                             ) {
                                 tokenManagement.setTokenOnSession(
@@ -63,7 +67,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
                                         session
                                 );
                             }
-                            else if (tokens != null && tokens.has(RequestMaker.ERROR_MSG)) {
+                            else if (tokens.has(RequestMaker.ERROR_MSG)) {
                                 throw new ServletException(tokens.getString(RequestMaker.ERROR_MSG));
                             } else {
                                 throw new ServletException("Could not refresh the tokens");

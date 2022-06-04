@@ -29,7 +29,6 @@ body {
 }
 
 .login .title {
-    font-weight: 600;
     font-size: 1.4rem;
     padding-left: 10px;
     color: red;
@@ -38,8 +37,6 @@ body {
 
 .login .dato_usuario input {
     width: 100%;
-    /*display: block;*/
-    /*outline: none;*/
     border: none;
     background: none;
     font-size: 1.2rem;
@@ -58,7 +55,6 @@ body {
 }
 
 .login .btn {
-    box-shadow: none;
     width: 100%;
     font-weight: 600;
     background-color: #4BCC78;
@@ -78,7 +74,7 @@ body {
     text-decoration: none;
     font-size: 1.2rem;
     color: white;
-    letter-spacing: 1.3px
+    letter-spacing: 1px
 }
 
 .login a {

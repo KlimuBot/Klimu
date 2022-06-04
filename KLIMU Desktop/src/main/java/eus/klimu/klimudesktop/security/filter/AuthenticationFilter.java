@@ -1,5 +1,6 @@
 package eus.klimu.klimudesktop.security.filter;
 
+import eus.klimu.klimudesktop.connection.RabbitConnector;
 import eus.klimu.klimudesktop.connection.RequestMaker;
 import eus.klimu.klimudesktop.security.TokenManagement;
 import lombok.extern.slf4j.Slf4j;

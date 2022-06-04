@@ -23,6 +23,17 @@ public class Location implements Comparable<Location> {
     }
 
     @Override
+    public boolean equals(Object loc) {
+        Location location = (Location) loc;
+
+        if (location != null) {
+            return this.getId().equals(location.getId());
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public int compareTo(Location l) {
         return this.toString().toLowerCase().compareTo(l.toString().toLowerCase());
     }

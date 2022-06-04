@@ -1,14 +1,13 @@
 package eus.klimu.klimudesktop;
 
+import eus.klimu.klimudesktop.connection.RabbitConnector;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.annotation.PreDestroy;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
@@ -18,7 +17,7 @@ import java.net.URISyntaxException;
 @SpringBootApplication
 public class KlimuDesktopApplication {
 
-    private static final String URL = "http://localhost:8080/klimu/login";
+    private static final String URL = "http://localhost:4040/klimu/login";
 
     public static void main(String[] args) {
         SpringApplication.run(KlimuDesktopApplication.class, args);
@@ -46,6 +45,11 @@ public class KlimuDesktopApplication {
                 e.printStackTrace();
             }
         }
+    }
+
+    @PreDestroy
+    public void destroy() {
+        RabbitConnector.stopConnection();
     }
 
 }

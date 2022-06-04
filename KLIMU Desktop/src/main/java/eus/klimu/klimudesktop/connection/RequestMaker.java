@@ -58,10 +58,21 @@ public class RequestMaker {
      * Make a GET request to a specific URL.
      * @param url The URL of the server method.
      * @param headers The headers for the request.
+     * @return The response from the server as a JSON object.
+     */
+    public ResponseEntity<String> doGet(String url, HttpHeaders headers) {
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        return restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+    }
+
+    /**
+     * Make a GET request to a specific URL.
+     * @param url The URL of the server method.
+     * @param headers The headers for the request.
      * @param body The body for the request, can be null.
      * @return The response from the server as a JSON object.
      */
-    public ResponseEntity<String> doGet(String url, HttpHeaders headers, @Nullable String body) {
+    public ResponseEntity<String> doGet(String url, HttpHeaders headers, String body) {
         HttpEntity<String> request;
         if (body != null) {
             request = new HttpEntity<>(body, headers);
@@ -69,16 +80,6 @@ public class RequestMaker {
             request = new HttpEntity<>(headers);
         }
         return restTemplate.exchange(url, HttpMethod.GET, request, String.class);
-    }
-
-    /**
-     * Make a GET request to a specific URL with a JSON.
-     * @param url The URL of the server method.
-     * @param json A json object for the request.
-     * @return A response with a JSON object.
-     */
-    public ResponseEntity<JSONObject> doGetJSON(String url, String json) {
-        return restTemplate.getForEntity(url, JSONObject.class, json);
     }
 
     /**
