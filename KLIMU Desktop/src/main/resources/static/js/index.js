@@ -1,3 +1,5 @@
+let errCount = 0
+
 function doGet() {
     $.ajax({
         url: "http://localhost:4040/klimu/notification",
@@ -6,6 +8,9 @@ function doGet() {
         success: function (response) {
             let display = $("#alert_display")
             let cardParent = $(".alerts-div")
+
+            // Set the error count to 0.
+            errCount = 0
 
             if (response.length > 0) {
                 if (display.hasClass('visually-hidden')) {
@@ -46,10 +51,13 @@ function doGet() {
             }
         },
         error: function (error) {
-            console.log(error)
+            console.log("The application is not running")
+            errCount++
         }
     })
-    setTimeout(doGet, 1000 * 60)
+    if (errCount < 5) {
+        setTimeout(doGet, 1000 * 60)
+    }
 }
 $(document).ready(function () {
     console.log("Loaded")
