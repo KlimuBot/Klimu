@@ -56,10 +56,10 @@ function doGet() {
         }
     })
     if (errCount < 5) {
-        setTimeout(doGet, 1000 * 60)
+        setTimeout(doGet, 1000 * 5)
     }
 }
 $(document).ready(function () {
     console.log("Loaded")
-    setTimeout(doGet, 1000 * 60)
+    setTimeout(doGet, 1000 * 5)
 })

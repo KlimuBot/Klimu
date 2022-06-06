@@ -27,13 +27,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
 @RequestMapping("/channel")
 @RequiredArgsConstructor
 public class ChannelController {
+
+    private static final String CHANNEL_LIST = "channelList";
 
     private final ChannelService channelService;
     private final LocationService locationService;
@@ -46,7 +47,7 @@ public class ChannelController {
     @GetMapping("/subscription")
     public String getSubscriptionPage(Model model) {
         log.info("Fetching the subscription page");
-        model.addAttribute("channelList", channelService.getAllChannels());
+        model.addAttribute(CHANNEL_LIST, channelService.getAllChannels());
 
         return "services/suscripciones";
     }
@@ -69,12 +70,12 @@ public class ChannelController {
             // Add elements to model.
             model.addAttribute("channelName", channel);
             model.addAttribute("notifications", notifications);
-            model.addAttribute("channelList", channelService.getAllChannels());
+            model.addAttribute(CHANNEL_LIST, channelService.getAllChannels());
 
             return "services/channel";
         } else {
             // Add elements to model.
-            model.addAttribute("channelList", channelService.getAllChannels());
+            model.addAttribute(CHANNEL_LIST, channelService.getAllChannels());
 
             return "services/suscripciones";
         }

@@ -60,8 +60,8 @@ public class RabbitConnector extends Thread {
             String queueName = channel.queueDeclare().getQueue();
             channel.queueBind(queueName, EXCHANGE_NAME, username);
 
-            NotificationConsumer consumer = new NotificationConsumer(channel);
-            String tag = channel.basicConsume(queueName, true, consumer);
+            notificationConsumer = new NotificationConsumer(channel);
+            String tag = channel.basicConsume(queueName, true, notificationConsumer);
 
             log.info("The connection was successful");
             // Keep the connection alive.

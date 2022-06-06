@@ -1,6 +1,7 @@
 package eus.klimu.users.api;
 
 import eus.klimu.users.domain.model.Role;
+import eus.klimu.users.domain.model.RoleDTO;
 import eus.klimu.users.domain.service.definition.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,8 +36,8 @@ public class RoleController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<Role> createRole(@RequestBody Role role) {
-        Role newRole = roleService.saveRole(role);
+    public ResponseEntity<Role> createRole(@RequestBody RoleDTO role) {
+        Role newRole = roleService.saveRole(new Role(role.getId(), role.getName()));
         if (newRole != null) {
             return ResponseEntity.created(
                     // Specify where has the object been created.
@@ -48,7 +49,7 @@ public class RoleController {
     }
 
     @PutMapping("/set")
-    public ResponseEntity<?> setUserRole(
+    public ResponseEntity<Object> setUserRole(
             @RequestParam String username,
             @RequestParam String roleName
     ) {

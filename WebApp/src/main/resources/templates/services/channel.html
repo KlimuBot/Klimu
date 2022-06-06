@@ -45,13 +45,13 @@
                         </div>
                         <div class="card-body">
                         <span class="m-3" th:if="${notification.getType().getType() == 'Information'}">
-                            <i class="bi bi-info-circle"></i>
+                            <em class="bi bi-info-circle"></em>
                         </span>
                             <span class="m-3" th:if="${notification.getType().getType() == 'Warning'}">
-                            <i class="bi bi-exclamation-triangle"></i>
+                            <em class="bi bi-exclamation-triangle"></em>
                         </span>
                             <span class="m-3" th:if="${notification.getType().getType() == 'Dangerous'}">
-                            <i class="bi bi-exclamation-square"></i>
+                            <em class="bi bi-exclamation-square"></em>
                         </span>
                             <h3 th:text="${notification.getType().getName().toUpperCase()}"></h3>
                             <p th:text="${notification.getType().getDescription()}"></p>
