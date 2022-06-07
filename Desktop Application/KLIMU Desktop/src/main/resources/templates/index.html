@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="includes/head :: head">
+    <title id="pageTitle">KLIMU App</title>
+</head>
+<body>
+    <!-- JS -->
+    <script th:src="@{'/js/index.js'}"></script>
+
+    <!-- Main -->
+    <div class="todo vh-100">
+        <div class="container text-center">
+            <a th:href="@{'https://klimu.eus'}" class="row d-flex justify-content-center align-items-center" target="_blank">
+                <img id="logo_index" th:src="@{'/media/img/klimu_title.png'}" alt="KLIMU" class="col img">
+                <img id="title_index" th:src="@{'/media/img/title.jpg'}" alt="Weather and Forecast Alerts" class="col img">
+            </a>
+        </div>
+        <div class="w-lg-25 w-md-50 w-sm-75">
+            <div id="alert_display" class="alert alert-danger visually-hidden m-3" role="alert">
+                You have no new notifications!
+            </div>
+            <div th:if="${notifications.size() > 0}" class="alerts-div overflow-auto h-75">
+                <th:block th:each="notification : ${notifications}">
+                    <div class="card m-3">
+                        <div class="card-header row ms-0 me-0">
+                            <div class="col" th:text="${notification.getType().getName() + ' at ' + notification.getLocation()}"></div>
+                            <div class="col" style="text-align: right">
+                                <span class="m-3" th:if="${notification.getType().getType() == 'Information'}">
+                                    <i class="bi bi-info-circle"></i>
+                                </span>
+                                <span class="m-3" th:if="${notification.getType().getType() == 'Warning'}">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                </span>
+                                <span class="m-3" th:if="${notification.getType().getType() == 'Dangerous'}">
+                                    <i class="bi bi-exclamation-square"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h3 th:text="${notification.getDate()}"></h3>
+                            <p th:text="${notification.getMessage()}"></p>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+            <div class="py-4 unsuscribe w-100 text-center">
+                <a id="unsuscribe" href="/logout">EXIT?</a>
+            </div>
+        </div>
+    </div>
+    </body>
+</html>
