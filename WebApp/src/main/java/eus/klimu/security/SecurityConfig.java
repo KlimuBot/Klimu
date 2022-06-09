@@ -53,6 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/js/**", "/css/**", "/media/**").permitAll()
                 .antMatchers("/user/create", "/login/sign-up").permitAll()
                 .antMatchers("/", "/index", "/home").permitAll()
+                .antMatchers("/github-webhook/**").permitAll()
             .and().authorizeRequests()
                 .antMatchers("/role/**").hasAuthority("ADMIN_ROLE")
                 .antMatchers("/email/**", "/channel/**").hasAnyAuthority("USER_ROLE", "ADMIN_ROLE")

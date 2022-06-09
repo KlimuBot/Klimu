@@ -30,7 +30,8 @@ public class AuthorizationFilter extends OncePerRequestFilter {
                 !request.getServletPath().startsWith("/media") &&
                 !request.getServletPath().startsWith("/login") &&
                 !request.getServletPath().equals("/user/create")&&
-                !request.getServletPath().equals("/login/sign-up")
+                !request.getServletPath().equals("/login/sign-up") &&
+                !request.getServletPath().startsWith("/github-webhook")
         ) {
             HttpSession session = request.getSession();
             TokenManagement tokenManagement = new TokenManagement();
