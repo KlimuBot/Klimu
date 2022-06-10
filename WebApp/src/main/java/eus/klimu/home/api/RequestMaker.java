@@ -2,7 +2,6 @@ package eus.klimu.home.api;
 
 import eus.klimu.security.TokenManagement;
 import lombok.NoArgsConstructor;
-import org.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.lang.Nullable;
 import org.springframework.util.LinkedMultiValueMap;
@@ -10,7 +9,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
-import java.util.Map;
 
 @NoArgsConstructor
 public class RequestMaker {
